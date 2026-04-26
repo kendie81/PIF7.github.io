@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz de compréhension – Nos vacances</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#F5F5F5;min-height:100vh;color:#242424}
+.site-nav{background:#0078D4;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:48px;position:sticky;top:0;z-index:100}
+.nav-brand{color:#fff;font-weight:700;font-size:15px;text-decoration:none}
+.nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.nav-links a{color:#C7E0F4;font-size:13px;text-decoration:none;padding:6px 12px;border-radius:4px;transition:background 0.12s}
+.nav-links a:hover,.nav-links a.active{background:rgba(255,255,255,0.15);color:#fff}
+.page{max-width:680px;margin:0 auto;padding:2rem 1rem 3rem}
+.page-header{background:#0078D4;border-radius:6px;padding:20px 24px;margin-bottom:1.75rem}
+.page-header h1{font-size:20px;font-weight:700;color:#fff;margin-bottom:4px}
+.page-header p{font-size:13px;color:#C7E0F4}
+
+.progress-wrap{margin-bottom:1.75rem}
+.progress-meta{display:flex;justify-content:space-between;font-size:13px;color:#616161;margin-bottom:6px}
+.progress-meta span{font-weight:600;color:#0078D4}
+.prog-bg{background:#D1D1D1;border-radius:99px;height:6px}
+.prog-fill{background:#0078D4;height:6px;border-radius:99px;transition:width 0.4s ease}
+
+.section-label{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#fff;background:#005A9E;display:inline-block;padding:3px 10px;border-radius:3px;margin-bottom:12px}
+
+.q-card{background:#fff;border:1px solid #D1D1D1;border-radius:6px;padding:18px 20px;margin-bottom:14px}
+.q-num{font-size:11px;font-weight:700;color:#A0A0A0;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.q-text{font-size:15px;color:#242424;line-height:1.6;margin-bottom:14px;font-weight:600}
+.q-source{font-size:12px;color:#616161;font-style:italic;margin-bottom:14px;padding:8px 12px;background:#F5F5F5;border-radius:4px;border-left:3px solid #C7E0F4}
+
+.mc-options{display:flex;flex-direction:column;gap:8px}
+.mc-opt{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid #D1D1D1;border-radius:4px;cursor:pointer;font-size:14px;color:#242424;background:#fff;text-align:left;font-family:inherit;width:100%;transition:background 0.12s,border-color 0.12s}
+.mc-opt:hover{background:#EFF6FC;border-color:#0078D4}
+.mc-opt.selected{background:#EFF6FC;border-color:#0078D4;color:#005A9E}
+.mc-opt.correct{background:#DFF6DD;border-color:#107C10;color:#107C10;cursor:default}
+.mc-opt.wrong{background:#FDE7E9;border-color:#A4262C;color:#A4262C}
+.mc-opt.reveal{background:#DFF6DD;border-color:#107C10;color:#107C10;cursor:default}
+.mc-opt.disabled{cursor:default;opacity:.7}
+.opt-letter{width:24px;height:24px;border-radius:50%;background:#F5F5F5;border:1px solid #D1D1D1;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:#616161}
+.mc-opt.selected .opt-letter{background:#0078D4;border-color:#0078D4;color:#fff}
+.mc-opt.correct .opt-letter{background:#107C10;border-color:#107C10;color:#fff}
+.mc-opt.wrong .opt-letter{background:#A4262C;border-color:#A4262C;color:#fff}
+.mc-opt.reveal .opt-letter{background:#107C10;border-color:#107C10;color:#fff}
+
+.tf-row{display:flex;gap:10px}
+.tf-btn{flex:1;padding:12px;border:1px solid #D1D1D1;border-radius:4px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;background:#fff;color:#242424;transition:background 0.12s,border-color 0.12s}
+.tf-btn:hover{background:#EFF6FC;border-color:#0078D4}
+.tf-btn.selected{background:#EFF6FC;border-color:#0078D4;color:#005A9E}
+.tf-btn.correct{background:#DFF6DD;border-color:#107C10;color:#107C10;cursor:default}
+.tf-btn.wrong{background:#FDE7E9;border-color:#A4262C;color:#A4262C}
+.tf-btn.reveal{background:#DFF6DD;border-color:#107C10;color:#107C10;cursor:default}
+.tf-btn.disabled{cursor:default;opacity:.7}
+
+.fill-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.fill-input{padding:8px 12px;border:1.5px solid #D1D1D1;border-radius:4px;font-size:15px;font-family:inherit;color:#242424;background:#fff;outline:none;min-width:160px;transition:border-color 0.15s}
+.fill-input:focus{border-color:#0078D4}
+.fill-input.correct{border-color:#107C10;background:#DFF6DD;color:#107C10}
+.fill-input.wrong{border-color:#A4262C;background:#FDE7E9;color:#A4262C}
+.fill-input.disabled{cursor:default}
+.fill-check{padding:8px 16px;border-radius:4px;border:1px solid #0078D4;background:#0078D4;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.12s}
+.fill-check:hover{background:#005A9E}
+.fill-hint{font-size:12px;color:#616161;margin-top:6px}
+.fill-hint.ok{color:#107C10;font-weight:600}
+.fill-hint.err{color:#A4262C}
+
+.feedback-bar{margin-top:10px;padding:8px 12px;border-radius:4px;font-size:13px;display:none}
+.feedback-bar.ok{background:#DFF6DD;color:#107C10;border:1px solid #A8D8A8;display:block}
+.feedback-bar.err{background:#FDE7E9;color:#A4262C;border:1px solid #F4ACAC;display:block}
+
+.submit-row{margin-top:2rem;display:flex;justify-content:center}
+.submit-btn{padding:12px 40px;background:#0078D4;border:none;border-radius:4px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s}
+.submit-btn:hover{background:#005A9E}
+.submit-btn:disabled{background:#A0A0A0;cursor:default}
+
+.results-card{background:#fff;border:1px solid #D1D1D1;border-radius:6px;padding:2rem;text-align:center;margin-top:1.5rem;display:none}
+.results-score{font-size:48px;font-weight:700;color:#0078D4;line-height:1}
+.results-denom{font-size:18px;color:#616161;margin-bottom:.5rem}
+.results-label{font-size:16px;font-weight:600;color:#242424;margin-bottom:.5rem}
+.results-msg{font-size:14px;color:#616161;margin-bottom:1.5rem}
+.results-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
+.rb-cell{background:#F5F5F5;border-radius:4px;padding:10px;text-align:center}
+.rb-num{font-size:22px;font-weight:700;color:#0078D4}
+.rb-label{font-size:11px;color:#616161;margin-top:2px}
+.retry-btn{padding:10px 28px;background:#0078D4;border:none;border-radius:4px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-right:10px;transition:background 0.15s}
+.retry-btn:hover{background:#005A9E}
+.home-btn{padding:10px 28px;background:#fff;border:1px solid #D1D1D1;border-radius:4px;color:#242424;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:background 0.12s}
+.home-btn:hover{background:#F5F5F5}
+
+.next-bar{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid #E0E0E0;display:flex;justify-content:space-between;align-items:center}
+.back-link{font-size:13px;color:#0078D4;text-decoration:none}
+.back-link:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="index.html" class="nav-brand">Nos vacances</a>
+  <div class="nav-links">
+    <a href="index.html">Accueil</a>
+    <a href="flashcards.html">Cartes éclair</a>
+    <a href="association.html">Exercices</a>
+    <a href="lecture.html">Lecture</a>
+    <a href="quiz.html" class="active">Quiz</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <h1>Quiz de compréhension</h1>
+    <p>Échange de courriels : Marc et Sophie | CECR A1.2 / A2.1</p>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span id="progLabel">Question 1 sur 15</span>
+      <span id="progPct">0%</span>
+    </div>
+    <div class="prog-bg"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+
+  <div id="quizBody"></div>
+
+  <div class="submit-row">
+    <button class="submit-btn" id="submitBtn" onclick="submitQuiz()">Soumettre mes réponses</button>
+  </div>
+
+  <div class="results-card" id="resultsCard">
+    <div class="results-score" id="rScore"></div>
+    <div class="results-denom" id="rDenom"></div>
+    <div class="results-label" id="rLabel"></div>
+    <div class="results-msg" id="rMsg"></div>
+    <div class="results-breakdown" id="rBreakdown"></div>
+    <button class="retry-btn" onclick="retryQuiz()">Réessayer</button>
+    <a href="index.html" class="home-btn">Retour à l'accueil</a>
+  </div>
+
+  <div class="next-bar">
+    <a href="lecture.html" class="back-link">← Retour à la lecture</a>
+    <a href="index.html" class="back-link">Accueil →</a>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    type: "mc",
+    section: "Choix multiple",
+    q: "Où est Marc pendant ses vacances ?",
+    source: "« Je suis en vacances avec ma famille à Tracadie. »",
+    opts: ["Au Lac Baker", "À Tracadie", "À Moncton", "À Fredericton"],
+    answer: 1
+  },
+  {
+    type: "mc",
+    section: "Choix multiple",
+    q: "Où est le chalet de Marc ?",
+    source: "« On est dans notre chalet près de la plage. »",
+    opts: ["Dans la forêt", "Dans la montagne", "Près de la plage", "Près du lac"],
+    answer: 2
+  },
+  {
+    type: "mc",
+    section: "Choix multiple",
+    q: "Qu'est-ce que Marc et sa famille font le matin ?",
+    source: "« Le matin, on va à la plage pour nager dans l'océan. »",
+    opts: ["Ils font du canot", "Ils font des randonnées", "Ils nagent dans l'océan", "Ils font un pique-nique"],
+    answer: 2
+  },
+  {
+    type: "mc",
+    section: "Choix multiple",
+    q: "Comment est l'eau de l'océan selon Marc ?",
+    source: "« L'eau est un peu froide, mais c'est agréable ! »",
+    opts: ["Très chaude", "Un peu froide", "Très froide", "Parfaite"],
+    answer: 1
+  },
+  {
+    type: "mc",
+    section: "Choix multiple",
+    q: "Où est Sophie pendant ses vacances ?",
+    source: "« Moi, je suis aussi au Nouveau-Brunswick, mais au Lac Baker. »",
+    opts: ["À Tracadie", "À Bathurst", "Au Lac Baker", "À Campbellton"],
+    answer: 2
+  },
+  {
+    type: "mc",
+    section: "Choix multiple",
+    q: "Quel sport d'eau Sophie fait-elle le matin ?",
+    source: "« Le matin, on fait du canot sur le lac. »",
+    opts: ["Elle nage", "Elle fait du canot", "Elle fait du ski nautique", "Elle pêche"],
+    answer: 1
+  },
+  {
+    type: "mc",
+    section: "Choix multiple",
+    q: "Qu'est-ce que Sophie mange au feu de camp ?",
+    source: "« Le soir, on fait un feu de camp et on mange des guimauves. »",
+    opts: ["Des fruits de mer", "Des glaces", "Des guimauves", "Du pain"],
+    answer: 2
+  },
+  {
+    type: "tf",
+    section: "Vrai ou faux",
+    q: "Marc et Sophie sont en vacances dans la même ville.",
+    source: "Marc est à Tracadie ; Sophie est au Lac Baker.",
+    answer: false
+  },
+  {
+    type: "tf",
+    section: "Vrai ou faux",
+    q: "Marc mange des fruits de mer pendant ses vacances.",
+    source: "« On mange aussi beaucoup de fruits de mer. C'est délicieux. »",
+    answer: true
+  },
+  {
+    type: "tf",
+    section: "Vrai ou faux",
+    q: "Sophie trouve la forêt bruyante et agitée.",
+    source: "« Ici, c'est très différent de la plage. C'est très calme et tranquille. »",
+    answer: false
+  },
+  {
+    type: "tf",
+    section: "Vrai ou faux",
+    q: "Le soir, Marc regarde le coucher de soleil.",
+    source: "« Le soir, on regarde le coucher de soleil. C'est magnifique ! »",
+    answer: true
+  },
+  {
+    type: "tf",
+    section: "Vrai ou faux",
+    q: "Sophie et sa famille font des randonnées dans la forêt.",
+    source: "« L'après-midi, on fait des randonnées dans la forêt... »",
+    answer: true
+  },
+  {
+    type: "fill",
+    section: "Complète la phrase",
+    q: "Marc dit que le coucher de soleil est ___.",
+    source: "« Le soir, on regarde le coucher de soleil. C'est ___ ! »",
+    answer: "magnifique",
+    hint: "Un adjectif qui veut dire « very beautiful »"
+  },
+  {
+    type: "fill",
+    section: "Complète la phrase",
+    q: "Sophie dit que le lac est très ___ — parfait pour le canot.",
+    source: "« L'eau du lac est très ___. »",
+    answer: "calme",
+    hint: "Un adjectif qui veut dire « calm / quiet »"
+  },
+  {
+    type: "fill",
+    section: "Complète la phrase",
+    q: "L'après-midi, Marc marche sur le ___.",
+    source: "« L'après-midi, on mange des glaces ou on marche sur le ___. »",
+    answer: "sable",
+    hint: "Le mot anglais est « sand »"
+  }
+];
+
+let state = {};
+
+function initQuiz() {
+  state = {
+    mc: QUESTIONS.map(() => null),
+    tf: QUESTIONS.map(() => null),
+    fill: QUESTIONS.map(() => ({ val: "", checked: false, correct: null })),
+    submitted: false,
+    score: 0
+  };
+  renderQuiz();
+  document.getElementById('resultsCard').style.display = 'none';
+  document.getElementById('submitBtn').style.display = 'block';
+  document.getElementById('submitBtn').disabled = false;
+  updateProgress();
+}
+
+function updateProgress() {
+  let answered = 0;
+  QUESTIONS.forEach((q, i) => {
+    if (q.type === 'mc' && state.mc[i] !== null) answered++;
+    if (q.type === 'tf' && state.tf[i] !== null) answered++;
+    if (q.type === 'fill' && state.fill[i].checked) answered++;
+  });
+  const pct = Math.round((answered / QUESTIONS.length) * 100);
+  document.getElementById('progLabel').textContent = 'Progression : ' + answered + ' sur ' + QUESTIONS.length;
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+}
+
+function renderQuiz() {
+  const body = document.getElementById('quizBody');
+  let html = '';
+  let lastSection = '';
+  QUESTIONS.forEach((q, i) => {
+    if (q.section !== lastSection) {
+      html += '<div class="section-label">' + q.section + '</div>';
+      lastSection = q.section;
+    }
+    html += '<div class="q-card" id="qcard-' + i + '">';
+    html += '<div class="q-num">Question ' + (i + 1) + ' / ' + QUESTIONS.length + '</div>';
+    html += '<div class="q-text">' + q.q + '</div>';
+    html += '<div class="q-source">' + q.source + '</div>';
+
+    if (q.type === 'mc') {
+      html += '<div class="mc-options">';
+      const letters = ['A','B','C','D'];
+      q.opts.forEach((opt, oi) => {
+        let cls = 'mc-opt';
+        if (state.submitted) {
+          if (oi === q.answer) cls += ' correct';
+          else if (state.mc[i] === oi && oi !== q.answer) cls += ' wrong';
+          else cls += ' disabled';
+        } else if (state.mc[i] === oi) cls += ' selected';
+        const lCls = cls.includes('correct') || cls.includes('reveal') ? 'opt-letter' : (cls.includes('wrong') ? 'opt-letter' : (cls.includes('selected') ? 'opt-letter' : 'opt-letter'));
+        html += '<button class="' + cls + '" onclick="pickMC(' + i + ',' + oi + ')">';
+        html += '<span class="opt-letter">' + letters[oi] + '</span>' + opt;
+        html += '</button>';
+      });
+      html += '</div>';
+      if (state.submitted) {
+        const ok = state.mc[i] === q.answer;
+        html += '<div class="feedback-bar ' + (ok ? 'ok' : 'err') + '">' + (ok ? 'Correct !' : 'La bonne réponse est : ' + q.opts[q.answer]) + '</div>';
+      }
+    }
+
+    if (q.type === 'tf') {
+      const tv = state.tf[i];
+      let trCls = 'tf-btn', faCls = 'tf-btn';
+      if (state.submitted) {
+        if (q.answer === true) { trCls += ' correct'; faCls += (tv === false ? ' wrong' : ' disabled'); }
+        else { faCls += ' correct'; trCls += (tv === true ? ' wrong' : ' disabled'); }
+      } else {
+        if (tv === true) trCls += ' selected';
+        if (tv === false) faCls += ' selected';
+      }
+      html += '<div class="tf-row">';
+      html += '<button class="' + trCls + '" onclick="pickTF(' + i + ',true)">Vrai</button>';
+      html += '<button class="' + faCls + '" onclick="pickTF(' + i + ',false)">Faux</button>';
+      html += '</div>';
+      if (state.submitted) {
+        const ok = state.tf[i] === q.answer;
+        html += '<div class="feedback-bar ' + (ok ? 'ok' : 'err') + '">' + (ok ? 'Correct !' : 'La bonne réponse est : ' + (q.answer ? 'Vrai' : 'Faux')) + '</div>';
+      }
+    }
+
+    if (q.type === 'fill') {
+      const fs = state.fill[i];
+      let inCls = 'fill-input';
+      if (fs.checked) inCls += (fs.correct ? ' correct' : ' wrong');
+      const dis = state.submitted || fs.checked ? ' disabled' : '';
+      html += '<div class="fill-row">';
+      html += '<input class="' + inCls + '" type="text" id="fill-' + i + '" value="' + (fs.val||'') + '" placeholder="Écris ta réponse..." oninput="fillInput(' + i + ')" onkeydown="fillKey(event,' + i + ')"' + (dis ? ' disabled' : '') + ' />';
+      if (!fs.checked && !state.submitted) {
+        html += '<button class="fill-check" onclick="checkFill(' + i + ')">Vérifier</button>';
+      }
+      html += '</div>';
+      if (fs.checked || state.submitted) {
+        const ok = fs.correct || (state.submitted && fs.val.trim().toLowerCase() === q.answer.toLowerCase());
+        html += '<div class="fill-hint ' + (ok ? 'ok' : 'err') + '">' + (ok ? 'Correct !' : 'La bonne réponse est : ' + q.answer) + '</div>';
+      } else {
+        html += '<div class="fill-hint">' + q.hint + '</div>';
+      }
+    }
+
+    html += '</div>';
+  });
+  body.innerHTML = html;
+}
+
+function pickMC(qi, oi) {
+  if (state.submitted) return;
+  state.mc[qi] = oi;
+  renderQuiz();
+  updateProgress();
+}
+
+function pickTF(qi, val) {
+  if (state.submitted) return;
+  state.tf[qi] = val;
+  renderQuiz();
+  updateProgress();
+}
+
+function fillInput(qi) {
+  const el = document.getElementById('fill-' + qi);
+  if (el) state.fill[qi].val = el.value;
+}
+
+function fillKey(e, qi) {
+  if (e.key === 'Enter') checkFill(qi);
+}
+
+function checkFill(qi) {
+  const el = document.getElementById('fill-' + qi);
+  if (!el) return;
+  const val = el.value.trim().toLowerCase();
+  const correct = val === QUESTIONS[qi].answer.toLowerCase();
+  state.fill[qi] = { val: el.value, checked: true, correct };
+  renderQuiz();
+  updateProgress();
+}
+
+function submitQuiz() {
+  state.submitted = true;
+  let score = 0;
+  QUESTIONS.forEach((q, i) => {
+    if (q.type === 'mc' && state.mc[i] === q.answer) score++;
+    if (q.type === 'tf' && state.tf[i] === q.answer) score++;
+    if (q.type === 'fill') {
+      const v = (state.fill[i].val || '').trim().toLowerCase();
+      if (v === q.answer.toLowerCase()) score++;
+    }
+  });
+  state.score = score;
+  renderQuiz();
+  document.getElementById('submitBtn').style.display = 'none';
+  showResults(score);
+  document.getElementById('progFill').style.width = '100%';
+  document.getElementById('progLabel').textContent = 'Quiz terminé !';
+  document.getElementById('progPct').textContent = Math.round((score / QUESTIONS.length) * 100) + '%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showResults(score) {
+  const total = QUESTIONS.length;
+  const pct = Math.round((score / total) * 100);
+  const mc_t = QUESTIONS.filter(q => q.type === 'mc').length;
+  const tf_t = QUESTIONS.filter(q => q.type === 'tf').length;
+  const fi_t = QUESTIONS.filter(q => q.type === 'fill').length;
+  let mc_s = 0, tf_s = 0, fi_s = 0;
+  QUESTIONS.forEach((q, i) => {
+    if (q.type === 'mc' && state.mc[i] === q.answer) mc_s++;
+    if (q.type === 'tf' && state.tf[i] === q.answer) tf_s++;
+    if (q.type === 'fill' && (state.fill[i].val||'').trim().toLowerCase() === q.answer.toLowerCase()) fi_s++;
+  });
+  let label, msg;
+  if (pct >= 90) { label = 'Excellent travail !'; msg = 'Tu comprends très bien le texte. Bravo !'; }
+  else if (pct >= 70) { label = 'Bien joué !'; msg = 'Tu as bien compris le texte. Relis les questions que tu as manquées.'; }
+  else if (pct >= 50) { label = 'Pas mal !'; msg = 'Tu comprends le texte en partie. Relis les courriels et réessaie !'; }
+  else { label = 'Continue à pratiquer !'; msg = 'Relis les courriels attentivement, puis réessaie le quiz.'; }
+
+  document.getElementById('rScore').textContent = score;
+  document.getElementById('rDenom').textContent = '/ ' + total;
+  document.getElementById('rLabel').textContent = label;
+  document.getElementById('rMsg').textContent = msg;
+  document.getElementById('rBreakdown').innerHTML =
+    '<div class="rb-cell"><div class="rb-num">' + mc_s + '/' + mc_t + '</div><div class="rb-label">Choix multiple</div></div>' +
+    '<div class="rb-cell"><div class="rb-num">' + tf_s + '/' + tf_t + '</div><div class="rb-label">Vrai ou faux</div></div>' +
+    '<div class="rb-cell"><div class="rb-num">' + fi_s + '/' + fi_t + '</div><div class="rb-label">Mots manquants</div></div>';
+  document.getElementById('resultsCard').style.display = 'block';
+  document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function retryQuiz() {
+  initQuiz();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+initQuiz();
+</script>
+</body>
+</html>
