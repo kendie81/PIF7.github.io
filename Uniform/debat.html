@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lettres de débat – L'uniforme scolaire</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --blue:#0078D4;
+  --blue-dark:#005A9E;
+  --blue-light:#EFF6FC;
+  --blue-mid:#C7E0F4;
+  --green:#107C10;
+  --green-bg:#DFF6DD;
+  --green-mid:#A8D8A8;
+  --red:#A4262C;
+  --red-bg:#FDE7E9;
+  --ink:#1A1A2E;
+  --muted:#616161;
+  --border:#D1D1D1;
+  --surface:#F5F5F5;
+}
+
+body {
+  font-family:'Source Serif 4', Georgia, serif;
+  background: var(--surface);
+  color: var(--ink);
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* PAGE */
+.page{max-width:1100px;margin:0 auto;padding-top:2.5rem;padding:2.5rem 1.5rem 4rem}
+
+/* HEADER */
+.page-header{text-align:center;margin-bottom:3rem}
+.topic-label{display:inline-block;font-family:'Segoe UI',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-dark);background:var(--blue-light);border:1px solid var(--blue-mid);padding:4px 14px;border-radius:4px;margin-bottom:16px}
+.page-header h1{font-family:'Playfair Display',Georgia,serif;font-size:32px;font-weight:600;color:var(--ink);line-height:1.2;margin-bottom:10px}
+.page-header p{font-size:15px;color:var(--muted);font-style:italic;max-width:560px;margin:0 auto}
+
+/* DEBATE BAR */
+.debate-bar{display:flex;align-items:center;gap:0;background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:2.5rem;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+.side-tag{flex:1;padding:12px 20px;text-align:center;font-family:'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:700}
+.side-tag.pour{background:var(--green-bg);color:var(--green);border-right:1px solid var(--green-mid)}
+.side-tag.contre{background:var(--red-bg);color:var(--red)}
+.vs-badge{padding:10px 20px;background:var(--ink);color:#fff;font-family:'Playfair Display',serif;font-size:14px;font-style:italic;letter-spacing:.03em;flex-shrink:0}
+
+/* LETTERS GRID */
+.letters-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:3rem}
+@media(max-width:720px){.letters-grid{grid-template-columns:1fr}}
+
+/* LETTER CARD */
+.letter-card{background:#fff;border-radius:6px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;flex-direction:column}
+.letter-card.pour .letter-accent{background:var(--green)}
+.letter-card.contre .letter-accent{background:var(--red)}
+.letter-accent{height:4px;width:100%}
+
+.letter-header{padding:20px 24px 16px;border-bottom:1px solid #F0F0F0}
+.letter-position{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.letter-card.pour .letter-position{color:var(--green)}
+.letter-card.contre .letter-position{color:var(--red)}
+.letter-to{font-family:'Source Serif 4',Georgia,serif;font-size:15px;color:var(--ink);font-style:italic;margin-bottom:2px}
+.letter-from{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;color:var(--muted)}
+
+.author-chip{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:6px 12px;border-radius:99px;background:var(--surface)}
+.letter-card.pour .author-chip{border:1px solid var(--green-mid)}
+.letter-card.contre .author-chip{border:1px solid #F4ACAC}
+.avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Segoe UI',Arial,sans-serif;font-size:11px;font-weight:700;flex-shrink:0}
+.letter-card.pour .avatar{background:var(--green-bg);color:var(--green)}
+.letter-card.contre .avatar{background:var(--red-bg);color:var(--red)}
+.author-name{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:600;color:var(--ink)}
+.author-class{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;color:var(--muted)}
+
+/* LETTER BODY */
+.letter-body{padding:24px;font-size:15px;line-height:1.85;color:var(--ink);flex:1}
+.letter-body p{margin-bottom:1rem}
+.letter-body p:last-child{margin-bottom:0}
+
+/* Argument highlights */
+.arg{position:relative;padding-left:14px;margin-bottom:1.1rem}
+.arg::before{content:'';position:absolute;left:0;top:4px;bottom:4px;width:3px;border-radius:2px}
+.letter-card.pour .arg::before{background:var(--green)}
+.letter-card.contre .arg::before{background:var(--red)}
+.arg-label{font-family:'Segoe UI',Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.letter-card.pour .arg-label{color:var(--green)}
+.letter-card.contre .arg-label{color:var(--red)}
+
+.letter-conclusion{margin-top:1.25rem;padding:14px 16px;border-radius:4px;font-size:14px;line-height:1.7}
+.letter-card.pour .letter-conclusion{background:var(--green-bg);border:1px solid var(--green-mid)}
+.letter-card.contre .letter-conclusion{background:var(--red-bg);border:1px solid #F4ACAC}
+
+.letter-sig{margin-top:1.5rem;padding-top:1rem;border-top:1px solid #F0F0F0;font-style:italic;font-size:14px;color:var(--muted)}
+.letter-sig strong{color:var(--ink);font-style:normal}
+
+/* SUMMARY TABLE */
+.compare-section{margin-bottom:3rem}
+.compare-title{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.compare-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;font-size:14px}
+.compare-table th{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:10px 16px;text-align:left;border-bottom:1px solid var(--border)}
+.compare-table th:first-child{background:var(--surface);color:var(--muted);width:22%}
+.compare-table th.th-pour{background:var(--green-bg);color:var(--green)}
+.compare-table th.th-contre{background:var(--red-bg);color:var(--red)}
+.compare-table td{padding:11px 16px;border-bottom:1px solid #F0F0F0;vertical-align:top;line-height:1.5}
+.compare-table tr:last-child td{border-bottom:none}
+.compare-table td:first-child{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--surface)}
+
+/* NOM LINE */
+.nom-line{padding:14px 20px;background:#fff;border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;gap:12px;font-family:'Segoe UI',Arial,sans-serif}
+.nom-label{font-size:13px;color:var(--muted);white-space:nowrap}
+.nom-blank{flex:1;border-bottom:1.5px solid var(--blue);height:24px}
+
+.site-nav{background:#0078D4;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:48px;position:sticky;top:0;z-index:100}
+.nav-brand{color:#fff;font-weight:700;font-size:15px;text-decoration:none;font-family:'Segoe UI',Arial,sans-serif}
+.nav-links{display:flex;gap:4px}
+.nav-links a{color:#C7E0F4;font-size:13px;text-decoration:none;padding:6px 12px;border-radius:4px;font-family:'Segoe UI',Arial,sans-serif;transition:background 0.12s}
+.nav-links a:hover,.nav-links a.active{background:rgba(255,255,255,0.15);color:#fff}
+
+.next-bar{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid #E0E0E0;display:flex;justify-content:space-between;align-items:center}
+.next-link{display:inline-block;background:#0078D4;color:#fff;font-size:14px;font-weight:700;text-decoration:none;padding:10px 22px;border-radius:4px;transition:background 0.15s;font-family:'Segoe UI',Arial,sans-serif}
+.next-link:hover{background:#005A9E}
+.back-link{font-size:13px;color:#0078D4;text-decoration:none;font-family:'Segoe UI',Arial,sans-serif}
+.back-link:hover{text-decoration:underline}
+.spacer{flex:1}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="index.html" class="nav-brand">L'uniforme scolaire</a>
+  <div class="nav-links">
+    <a href="index.html">Accueil</a>
+    <a href="debat.html" class="active">Lecture</a>
+    <a href="flashcards.html">Cartes éclair</a>
+    <a href="quiz.html">Quiz</a>
+  </div>
+</nav>
+
+
+
+<div class="page">
+
+  <div class="page-header">
+    <div class="topic-label">Textes d'opinion — Débat</div>
+    <h1>L'uniforme scolaire : pour ou contre ?</h1>
+    <p>Deux élèves du groupe 504 partagent leur opinion sur le port de l'uniforme à l'école.</p>
+  </div>
+
+  <div class="debate-bar">
+    <div class="side-tag pour">✓ &nbsp; Pour l'uniforme — Léo</div>
+    <div class="vs-badge">contre</div>
+    <div class="side-tag contre">Victoria — Contre l'uniforme &nbsp; ✗</div>
+  </div>
+
+  <div class="letters-grid">
+
+    <!-- LETTER 1: LEO -->
+    <div class="letter-card pour">
+      <div class="letter-accent"></div>
+      <div class="letter-header">
+        <div class="letter-position">Pour l'uniforme</div>
+        <div class="letter-to">Cher Monsieur Fréchette,</div>
+        <div class="letter-from">Lettre d'opinion formelle</div>
+        <div class="author-chip">
+          <div class="avatar">LB</div>
+          <div>
+            <div class="author-name">Léo</div>
+            <div class="author-class">Groupe 504</div>
+          </div>
+        </div>
+      </div>
+      <div class="letter-body">
+        <p>Bonjour ! Je m'appelle Léo. Je suis dans votre classe, le groupe 504.</p>
+        <p>J'ai beaucoup réfléchi à l'uniforme de l'école. Je pense que c'est une bonne idée.</p>
+
+        <div class="arg">
+          <div class="arg-label">Argument 1 — Égalité</div>
+          D'abord, avec un uniforme, tous les élèves portent les mêmes vêtements. C'est bien parce qu'on ne regarde pas les marques de vêtements des autres. Personne ne se moque des vêtements des autres élèves. Tout le monde est égal et c'est plus gentil.
+        </div>
+
+        <div class="arg">
+          <div class="arg-label">Argument 2 — Esprit d'équipe</div>
+          Ensuite, quand on porte le même uniforme, on se sent comme une équipe. On est fier de notre école. Les profs nous reconnaissent facilement pendant les sorties scolaires. Ça donne une bonne image de notre école.
+        </div>
+
+        <div class="arg">
+          <div class="arg-label">Argument 3 — Concentration</div>
+          De plus, l'uniforme aide à mieux se concentrer. On ne perd pas de temps à regarder les vêtements des autres. On pense plus aux études et on travaille mieux en classe.
+        </div>
+
+        <div class="arg">
+          <div class="arg-label">Argument 4 — Routine du matin</div>
+          Enfin, le matin c'est plus simple avec un uniforme. On n'a pas besoin de choisir nos vêtements. On gagne du temps et c'est plus facile pour tout le monde.
+        </div>
+
+        <div class="letter-conclusion">
+          <strong>En conclusion,</strong> je pense que l'uniforme est une bonne idée. Ça aide à être plus gentil avec les autres. Ça aide aussi à se sentir bien à l'école. On apprend mieux et la routine du matin est plus simple.
+        </div>
+
+        <div class="letter-sig">Merci de m'avoir lu,<br><strong>Léo</strong></div>
+      </div>
+    </div>
+
+    <!-- LETTER 2: VICTORIA -->
+    <div class="letter-card contre">
+      <div class="letter-accent"></div>
+      <div class="letter-header">
+        <div class="letter-position">Contre l'uniforme</div>
+        <div class="letter-to">Chère Madame Turcotte,</div>
+        <div class="letter-from">Lettre d'opinion formelle</div>
+        <div class="author-chip">
+          <div class="avatar">VD</div>
+          <div>
+            <div class="author-name">Victoria</div>
+            <div class="author-class">Groupe 504</div>
+          </div>
+        </div>
+      </div>
+      <div class="letter-body">
+        <p>Bonjour ! Je m'appelle Victoria. Je suis dans votre classe, le groupe 504.</p>
+        <p>J'ai beaucoup pensé à l'uniforme de l'école. Je ne suis pas d'accord avec le port de l'uniforme. Voici pourquoi :</p>
+
+        <div class="arg">
+          <div class="arg-label">Argument 1 — Expression personnelle</div>
+          D'abord, quand on choisit nos vêtements, on peut montrer qui on est. À l'adolescence, c'est important de pouvoir s'exprimer. À l'école, on apprend à respecter les différences. Quand tout le monde s'habille différemment, on peut parler de nos goûts et apprendre à accepter les autres.
+        </div>
+
+        <div class="arg">
+          <div class="arg-label">Argument 2 — Confort</div>
+          Ensuite, les vêtements qu'on choisit sont souvent plus confortables. Les uniformes ne sont pas toujours confortables. Parfois, ils sont trop raides ou trop chauds. Avec nos propres vêtements, on peut s'habiller selon la météo ou notre humeur. C'est plus agréable pour apprendre.
+        </div>
+
+        <div class="arg">
+          <div class="arg-label">Argument 3 — Coût</div>
+          De plus, les uniformes coûtent très cher. Les enfants et les adolescents grandissent vite. Les parents doivent souvent acheter de nouveaux uniformes. C'est difficile pour les familles.
+        </div>
+
+        <div class="letter-conclusion">
+          <strong>En conclusion,</strong> je pense que l'uniforme n'est pas une bonne idée. Il empêche les élèves de montrer leur personnalité. Il n'est pas toujours confortable. Et il coûte trop cher pour les familles.
+        </div>
+
+        <div class="letter-sig">Merci de m'avoir lue,<br><strong>Victoria</strong></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- COMPARISON TABLE -->
+  <div class="compare-section">
+    <div class="compare-title">Tableau comparatif des arguments</div>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Thème</th>
+          <th class="th-pour">✓ Léo — Pour</th>
+          <th class="th-contre">✗ Victoria — Contre</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Égalité &amp; expression</td>
+          <td>Tous les élèves portent les mêmes vêtements — personne ne se moque des autres.</td>
+          <td>Choisir ses vêtements permet de montrer sa personnalité et d'apprendre à respecter les différences.</td>
+        </tr>
+        <tr>
+          <td>Esprit d'école &amp; confort</td>
+          <td>On se sent comme une équipe et on est fier de son école.</td>
+          <td>Les uniformes ne sont pas toujours confortables — trop raides ou trop chauds.</td>
+        </tr>
+        <tr>
+          <td>Études &amp; concentration</td>
+          <td>On ne perd pas de temps à regarder les vêtements des autres — on travaille mieux.</td>
+          <td>Être à l'aise dans ses vêtements aide aussi à mieux apprendre.</td>
+        </tr>
+        <tr>
+          <td>Praticité &amp; coût</td>
+          <td>Le matin est plus simple — on gagne du temps sans choisir ses vêtements.</td>
+          <td>Les uniformes coûtent cher et doivent être remplacés souvent car les enfants grandissent vite.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="nom-line">
+    <span class="nom-label" style="font-family:'Segoe UI',Arial,sans-serif">Nom :</span>
+    <div class="nom-blank"></div>
+  </div>
+
+
+<div class="next-bar"><span class="spacer"></span><a href="flashcards.html" class="next-link">Étape 2 : Cartes éclair →</a></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cartes éclair – L'uniforme scolaire</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#0078D4;--blue-dark:#005A9E;--blue-light:#EFF6FC;--blue-mid:#C7E0F4;
+  --ink:#1A1A2E;--muted:#616161;--border:#D1D1D1;--surface:#F5F5F5;
+  --green:#107C10;--green-bg:#DFF6DD;--green-mid:#A8D8A8;
+}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--surface);color:var(--ink);min-height:100vh}
+
+.page{max-width:640px;margin:0 auto;padding-top:2.5rem;padding:2.5rem 1.5rem 4rem}
+
+.page-header{text-align:center;margin-bottom:2rem}
+.topic-label{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-dark);background:var(--blue-light);border:1px solid var(--blue-mid);padding:4px 14px;border-radius:4px;margin-bottom:14px}
+.page-header h1{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:600;color:var(--ink);line-height:1.2;margin-bottom:6px}
+.page-header p{font-size:14px;color:var(--muted);font-style:italic}
+
+/* CATEGORY FILTER */
+.filter-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.cat-filter{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:1.5rem}
+.cat-btn{padding:5px 13px;border-radius:4px;border:1px solid var(--border);background:#fff;font-size:12px;cursor:pointer;color:var(--muted);font-family:inherit;transition:all 0.15s;font-weight:500}
+.cat-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}
+.cat-btn:hover:not(.active){background:var(--blue-light);border-color:var(--blue);color:var(--blue-dark)}
+
+/* SCORE STRIP */
+.score-strip{display:flex;gap:10px;margin-bottom:1rem}
+.score-pill{padding:5px 14px;border-radius:4px;font-size:13px;background:var(--blue-light);color:var(--blue-dark);border:1px solid var(--blue-mid)}
+.score-pill span{font-weight:700}
+
+/* PROGRESS */
+.prog-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px}
+.prog-bg{background:#D1D1D1;border-radius:99px;height:5px;margin-bottom:1.5rem}
+.prog-fill{background:var(--blue);height:5px;border-radius:99px;transition:width 0.4s ease}
+
+/* CARD */
+.card-scene{perspective:1000px;height:220px;margin-bottom:1.5rem;cursor:pointer;user-select:none}
+.card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform 0.55s cubic-bezier(.4,0,.2,1)}
+.card-inner.flipped{transform:rotateY(180deg)}
+.card-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:8px;border:1px solid var(--border);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.75rem 2rem;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.card-back{transform:rotateY(180deg);background:var(--blue-light);border-color:var(--blue-mid)}
+.card-cat{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;padding:3px 10px;border-radius:3px}
+.card-word{font-family:'Playfair Display',Georgia,serif;font-size:30px;font-weight:600;color:var(--ink);text-align:center;line-height:1.2;margin-bottom:6px}
+.card-gram{font-size:12px;color:var(--muted);font-style:italic;text-align:center;margin-bottom:4px}
+.card-hint{font-size:12px;color:#B0B0B0;margin-top:12px}
+.card-translation{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:600;color:var(--blue);text-align:center;margin-bottom:8px;line-height:1.3}
+.card-example{font-size:13px;color:var(--muted);text-align:center;font-style:italic;line-height:1.6;max-width:340px}
+
+/* BUTTONS */
+.btn-row{display:flex;gap:10px;justify-content:center;margin-bottom:1.75rem}
+.btn{padding:9px 22px;border-radius:4px;border:1px solid var(--border);background:#fff;color:var(--ink);font-size:14px;cursor:pointer;font-family:inherit;font-weight:500;transition:background 0.12s}
+.btn:hover{background:var(--surface);border-color:#999}
+.btn-primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn-primary:hover{background:var(--blue-dark);border-color:var(--blue-dark)}
+.btn-success{background:var(--green);border-color:var(--green);color:#fff}
+.btn-success:hover{background:#0A5E0A;border-color:#0A5E0A}
+
+/* DONE */
+.done-box{text-align:center;padding:2rem 1.5rem;background:var(--green-bg);border:1px solid var(--green-mid);border-radius:8px;margin-bottom:1.5rem;display:none}
+.done-box h3{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--green);margin-bottom:6px}
+.done-box p{font-size:14px;color:var(--muted);margin-bottom:1rem}
+
+/* NOM */
+.nom-line{margin-top:2.5rem;padding:14px 20px;background:#fff;border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;gap:12px}
+.nom-label{font-size:13px;color:var(--muted);white-space:nowrap}
+.nom-blank{flex:1;border-bottom:1.5px solid var(--blue);height:24px}
+
+.site-nav{background:#0078D4;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:48px;position:sticky;top:0;z-index:100}
+.nav-brand{color:#fff;font-weight:700;font-size:15px;text-decoration:none;font-family:'Segoe UI',Arial,sans-serif}
+.nav-links{display:flex;gap:4px}
+.nav-links a{color:#C7E0F4;font-size:13px;text-decoration:none;padding:6px 12px;border-radius:4px;font-family:'Segoe UI',Arial,sans-serif;transition:background 0.12s}
+.nav-links a:hover,.nav-links a.active{background:rgba(255,255,255,0.15);color:#fff}
+
+.next-bar{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid #E0E0E0;display:flex;justify-content:space-between;align-items:center}
+.next-link{display:inline-block;background:#0078D4;color:#fff;font-size:14px;font-weight:700;text-decoration:none;padding:10px 22px;border-radius:4px;transition:background 0.15s;font-family:'Segoe UI',Arial,sans-serif}
+.next-link:hover{background:#005A9E}
+.back-link{font-size:13px;color:#0078D4;text-decoration:none;font-family:'Segoe UI',Arial,sans-serif}
+.back-link:hover{text-decoration:underline}
+.spacer{flex:1}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="index.html" class="nav-brand">L'uniforme scolaire</a>
+  <div class="nav-links">
+    <a href="index.html">Accueil</a>
+    <a href="debat.html">Lecture</a>
+    <a href="flashcards.html" class="active">Cartes éclair</a>
+    <a href="quiz.html">Quiz</a>
+  </div>
+</nav>
+
+
+<div class="page">
+
+  <div class="page-header">
+    <div class="topic-label">Cartes éclair</div>
+    <h1>L'uniforme scolaire</h1>
+    <p>Clique sur la carte pour voir la traduction et un exemple.</p>
+  </div>
+
+  <div class="filter-label">Catégorie</div>
+  <div class="cat-filter" id="catFilter"></div>
+
+  <div class="score-strip">
+    <div class="score-pill">Connus : <span id="knownCount">0</span></div>
+    <div class="score-pill">Restants : <span id="leftCount">0</span></div>
+  </div>
+  <div class="prog-meta">
+    <span id="cardNum"></span>
+    <span id="pct">0 %</span>
+  </div>
+  <div class="prog-bg"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+
+  <div class="card-scene" id="cardScene" onclick="flipCard()" title="Cliquer pour retourner">
+    <div class="card-inner" id="cardInner">
+      <div class="card-face">
+        <div class="card-cat" id="frontCat"></div>
+        <div class="card-word" id="frontWord"></div>
+        <div class="card-gram" id="frontGram"></div>
+        <div class="card-hint">Cliquer pour voir la traduction</div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-translation" id="backTrans"></div>
+        <div class="card-example" id="backEx"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row" id="btnRow">
+    <button class="btn" onclick="skipCard()">Encore ↻</button>
+    <button class="btn btn-success" onclick="markKnown()">Je connais ✓</button>
+  </div>
+
+  <div class="done-box" id="doneBox">
+    <h3 id="doneTitle"></h3>
+    <p id="doneMsg"></p>
+    <button class="btn btn-primary" onclick="restart()">Recommencer</button>
+  </div>
+
+  <div class="nom-line">
+    <span class="nom-label">Nom :</span>
+    <div class="nom-blank"></div>
+  </div>
+
+</div>
+
+<script>
+const ALL = [
+  // 1 – Vêtements et apparence
+  {fr:"un uniforme",gram:"n.m.",en:"a uniform",ex:"Je porte un uniforme à l'école.",cat:"Vêtements"},
+  {fr:"un vêtement",gram:"n.m.",en:"a piece of clothing",ex:"J'aime choisir mes vêtements.",cat:"Vêtements"},
+  {fr:"une marque",gram:"n.f.",en:"a (clothing) brand",ex:"Les marques de vêtements coûtent cher.",cat:"Vêtements"},
+  {fr:"les couleurs",gram:"n.f.pl.",en:"colours",ex:"Les couleurs de mon uniforme sont le bleu et le blanc.",cat:"Vêtements"},
+  {fr:"confortable",gram:"adj.",en:"comfortable",ex:"Mes vêtements sont confortables.",cat:"Vêtements"},
+  {fr:"raide",gram:"adj.",en:"stiff / rigid",ex:"L'uniforme est trop raide.",cat:"Vêtements"},
+  {fr:"chaud / chaude",gram:"adj.",en:"hot / warm",ex:"Mon chandail est trop chaud.",cat:"Vêtements"},
+  {fr:"différent / différente",gram:"adj.",en:"different",ex:"Les élèves sont habillés de façon différente.",cat:"Vêtements"},
+  {fr:"pareil / pareille",gram:"adj.",en:"the same / alike",ex:"Avec l'uniforme, tout le monde est pareil.",cat:"Vêtements"},
+  // 2 – Sentiments et relations
+  {fr:"se sentir",gram:"v.",en:"to feel",ex:"Je me sens bien dans mes vêtements.",cat:"Sentiments"},
+  {fr:"être fier / fière",gram:"adj.",en:"to be proud",ex:"Je suis fier de mon école.",cat:"Sentiments"},
+  {fr:"gentil / gentille",gram:"adj.",en:"kind / nice",ex:"C'est gentil de respecter les autres.",cat:"Sentiments"},
+  {fr:"respecter",gram:"v.",en:"to respect",ex:"On doit respecter les différences.",cat:"Sentiments"},
+  {fr:"se moquer",gram:"v.",en:"to make fun of",ex:"On ne se moque pas des autres.",cat:"Sentiments"},
+  {fr:"accepter",gram:"v.",en:"to accept",ex:"On apprend à accepter les différences.",cat:"Sentiments"},
+  {fr:"s'exprimer",gram:"v.",en:"to express oneself",ex:"Je peux m'exprimer avec mes vêtements.",cat:"Sentiments"},
+  {fr:"montrer",gram:"v.",en:"to show",ex:"Je montre ma personnalité avec mes vêtements.",cat:"Sentiments"},
+  {fr:"une différence",gram:"n.f.",en:"a difference",ex:"On parle des différences à l'école.",cat:"Sentiments"},
+  {fr:"une personnalité",gram:"n.f.",en:"a personality",ex:"Chacun a sa personnalité.",cat:"Sentiments"},
+  {fr:"un goût",gram:"n.m.",en:"a taste / preference",ex:"J'ai mes goûts pour les vêtements.",cat:"Sentiments"},
+  {fr:"une humeur",gram:"n.f.",en:"a mood",ex:"Je m'habille selon mon humeur.",cat:"Sentiments"},
+  // 3 – École et études
+  {fr:"une école",gram:"n.f.",en:"a school",ex:"Notre école est grande.",cat:"École"},
+  {fr:"une classe",gram:"n.f.",en:"a class / classroom",ex:"Je suis dans la classe 504.",cat:"École"},
+  {fr:"un élève / une élève",gram:"n.",en:"a student / pupil",ex:"Les élèves portent un uniforme.",cat:"École"},
+  {fr:"un professeur",gram:"n.",en:"a teacher",ex:"Madame Turcotte est ma professeure.",cat:"École"},
+  {fr:"une sortie scolaire",gram:"n.f.",en:"a field trip",ex:"Nous allons en sortie scolaire demain.",cat:"École"},
+  {fr:"apprendre",gram:"v.",en:"to learn",ex:"On apprend à l'école.",cat:"École"},
+  {fr:"se concentrer",gram:"v.",en:"to concentrate / focus",ex:"Je me concentre sur mes études.",cat:"École"},
+  {fr:"travailler",gram:"v.",en:"to work / to study",ex:"On travaille mieux en classe.",cat:"École"},
+  {fr:"une idée",gram:"n.f.",en:"an idea",ex:"L'uniforme est une bonne idée.",cat:"École"},
+  {fr:"une opinion",gram:"n.f.",en:"an opinion",ex:"J'ai une opinion sur l'uniforme.",cat:"École"},
+  // 4 – Routine et temps
+  {fr:"le matin",gram:"n.m.",en:"the morning",ex:"Le matin, je mets mon uniforme.",cat:"Routine"},
+  {fr:"choisir",gram:"v.",en:"to choose",ex:"Je choisis mes vêtements.",cat:"Routine"},
+  {fr:"gagner du temps",gram:"expr.",en:"to save time",ex:"Avec un uniforme, je gagne du temps.",cat:"Routine"},
+  {fr:"facile",gram:"adj.",en:"easy",ex:"C'est plus facile avec un uniforme.",cat:"Routine"},
+  {fr:"simple",gram:"adj.",en:"simple",ex:"La routine est plus simple.",cat:"Routine"},
+  {fr:"la météo",gram:"n.f.",en:"the weather",ex:"Je m'habille selon la météo.",cat:"Routine"},
+  {fr:"la température",gram:"n.f.",en:"the temperature",ex:"La température change souvent.",cat:"Routine"},
+  // 5 – Argent et coûts
+  {fr:"cher / chère",gram:"adj.",en:"expensive",ex:"Les uniformes sont chers.",cat:"Argent"},
+  {fr:"coûter",gram:"v.",en:"to cost",ex:"Les uniformes coûtent trop cher.",cat:"Argent"},
+  {fr:"acheter",gram:"v.",en:"to buy",ex:"Les parents doivent acheter des uniformes.",cat:"Argent"},
+  {fr:"un prix",gram:"n.m.",en:"a price",ex:"Le prix des uniformes est élevé.",cat:"Argent"},
+  {fr:"une famille",gram:"n.f.",en:"a family",ex:"Les familles dépensent beaucoup d'argent.",cat:"Argent"},
+  // 6 – Connecteurs
+  {fr:"d'abord",gram:"adv.",en:"first of all / firstly",ex:"D'abord, je pense que...",cat:"Connecteurs"},
+  {fr:"ensuite",gram:"adv.",en:"then / next",ex:"Ensuite, c'est plus confortable.",cat:"Connecteurs"},
+  {fr:"de plus",gram:"expr.",en:"furthermore / moreover",ex:"De plus, ça coûte cher.",cat:"Connecteurs"},
+  {fr:"en conclusion",gram:"expr.",en:"in conclusion",ex:"En conclusion, je ne suis pas d'accord.",cat:"Connecteurs"},
+  {fr:"parce que",gram:"conj.",en:"because",ex:"Je suis contre parce que...",cat:"Connecteurs"},
+  {fr:"pour",gram:"prép.",en:"for / in favour of",ex:"Je suis pour l'uniforme.",cat:"Connecteurs"},
+  {fr:"contre",gram:"prép.",en:"against",ex:"Je suis contre l'uniforme.",cat:"Connecteurs"},
+  {fr:"merci de",gram:"expr.",en:"thank you for",ex:"Merci de m'avoir lu(e).",cat:"Connecteurs"},
+  // 7 – Verbes importants
+  {fr:"penser",gram:"v.",en:"to think",ex:"Je pense que l'uniforme est une bonne idée.",cat:"Verbes"},
+  {fr:"porter",gram:"v.",en:"to wear",ex:"Je porte un uniforme.",cat:"Verbes"},
+  {fr:"aider",gram:"v.",en:"to help",ex:"L'uniforme aide à mieux apprendre.",cat:"Verbes"},
+  {fr:"empêcher",gram:"v.",en:"to prevent / to stop",ex:"L'uniforme empêche d'exprimer sa personnalité.",cat:"Verbes"},
+  {fr:"grandir",gram:"v.",en:"to grow (up)",ex:"Les enfants grandissent vite.",cat:"Verbes"},
+  {fr:"dépenser",gram:"v.",en:"to spend (money)",ex:"Les familles dépensent beaucoup d'argent.",cat:"Verbes"},
+];
+
+const CAT_COLORS = {
+  "Vêtements":   {bg:"#EFF6FC",color:"#005A9E",border:"#C7E0F4"},
+  "Sentiments":  {bg:"#FDF2F8",color:"#8B2FC9",border:"#DDB6F2"},
+  "École":       {bg:"#DFF6DD",color:"#107C10",border:"#A8D8A8"},
+  "Routine":     {bg:"#FFF4E5",color:"#A65200",border:"#FFCB8E"},
+  "Argent":      {bg:"#FDE7E9",color:"#A4262C",border:"#F4ACAC"},
+  "Connecteurs": {bg:"#F3F2F1",color:"#444",border:"#C8C6C4"},
+  "Verbes":      {bg:"#E8F5E9",color:"#2E7D32",border:"#A5D6A7"},
+};
+
+const CATS = [...new Set(ALL.map(c => c.cat))];
+let activeCats = new Set(CATS);
+let deck = [], current = 0, known = 0, flipped = false;
+
+function buildDeck() {
+  deck = ALL.filter(c => activeCats.has(c.cat)).slice();
+  shuffle(deck);
+  current = 0; known = 0; flipped = false;
+  document.getElementById('cardInner').classList.remove('flipped');
+  document.getElementById('doneBox').style.display = 'none';
+  document.getElementById('cardScene').style.display = 'block';
+  document.getElementById('btnRow').style.display = 'flex';
+  updateUI();
+}
+
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+}
+
+function total() { return ALL.filter(c => activeCats.has(c.cat)).length; }
+
+function updateUI() {
+  if (deck.length === 0 || current >= deck.length) { showDone(); return; }
+  const c = deck[current];
+  const col = CAT_COLORS[c.cat] || CAT_COLORS["Verbes"];
+
+  const frontCat = document.getElementById('frontCat');
+  frontCat.textContent = c.cat;
+  frontCat.style.background = col.bg;
+  frontCat.style.color = col.color;
+  frontCat.style.border = '1px solid ' + col.border;
+
+  document.getElementById('frontWord').textContent = c.fr;
+  document.getElementById('frontGram').textContent = c.gram;
+  document.getElementById('backTrans').textContent = c.en;
+  document.getElementById('backEx').textContent = c.ex;
+
+  const t = total();
+  document.getElementById('cardNum').textContent = 'Carte ' + (current + 1) + ' sur ' + deck.length;
+  document.getElementById('pct').textContent = Math.round(known / t * 100) + ' %';
+  document.getElementById('progFill').style.width = (known / t * 100) + '%';
+  document.getElementById('knownCount').textContent = known;
+  document.getElementById('leftCount').textContent = deck.length - current;
+}
+
+function flipCard() {
+  flipped = !flipped;
+  document.getElementById('cardInner').classList.toggle('flipped', flipped);
+}
+
+function markKnown() {
+  deck.splice(current, 1);
+  known++;
+  flipped = false;
+  document.getElementById('cardInner').classList.remove('flipped');
+  updateUI();
+}
+
+function skipCard() {
+  const c = deck.splice(current, 1)[0];
+  deck.push(c);
+  flipped = false;
+  document.getElementById('cardInner').classList.remove('flipped');
+  if (current >= deck.length) current = 0;
+  updateUI();
+}
+
+function showDone() {
+  document.getElementById('cardScene').style.display = 'none';
+  document.getElementById('btnRow').style.display = 'none';
+  document.getElementById('progFill').style.width = '100%';
+  document.getElementById('pct').textContent = '100 %';
+  document.getElementById('knownCount').textContent = known;
+  document.getElementById('leftCount').textContent = 0;
+  const t = total();
+  document.getElementById('doneTitle').textContent = known >= t ? 'Excellent travail !' : 'Bien joué — ' + known + ' sur ' + t + ' mots appris !';
+  document.getElementById('doneMsg').textContent = known >= t ? 'Tu connais tous les mots de cette sélection !' : 'Continue à pratiquer pour maîtriser tous les mots.';
+  document.getElementById('doneBox').style.display = 'block';
+}
+
+function restart() { buildDeck(); }
+
+function renderCatButtons() {
+  const f = document.getElementById('catFilter');
+  f.innerHTML = '';
+
+  // All button
+  const allBtn = document.createElement('button');
+  allBtn.className = 'cat-btn' + (activeCats.size === CATS.length ? ' active' : '');
+  allBtn.textContent = 'Tout (' + ALL.length + ')';
+  allBtn.onclick = () => { activeCats = new Set(CATS); renderCatButtons(); buildDeck(); };
+  f.appendChild(allBtn);
+
+  CATS.forEach(cat => {
+    const count = ALL.filter(c => c.cat === cat).length;
+    const b = document.createElement('button');
+    b.className = 'cat-btn' + (activeCats.has(cat) ? ' active' : '');
+    b.textContent = cat + ' (' + count + ')';
+    b.onclick = () => {
+      // If clicking the only active one, do nothing
+      if (activeCats.has(cat) && activeCats.size === 1) return;
+      // If all are active, switch to just this one
+      if (activeCats.size === CATS.length) {
+        activeCats = new Set([cat]);
+      } else if (activeCats.has(cat)) {
+        activeCats.delete(cat);
+        if (activeCats.size === 0) activeCats = new Set(CATS);
+      } else {
+        activeCats.add(cat);
+      }
+      renderCatButtons();
+      buildDeck();
+    };
+    f.appendChild(b);
+  });
+}
+
+renderCatButtons();
+buildDeck();
+</script>
+</body>
+</html>

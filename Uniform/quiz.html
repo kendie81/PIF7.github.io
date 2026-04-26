@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz – L'uniforme scolaire</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#0078D4;--blue-dark:#005A9E;--blue-light:#EFF6FC;--blue-mid:#C7E0F4;
+  --green:#107C10;--green-bg:#DFF6DD;--green-mid:#A8D8A8;
+  --red:#A4262C;--red-bg:#FDE7E9;--red-mid:#F4ACAC;
+  --ink:#1A1A2E;--muted:#616161;--border:#D1D1D1;--surface:#F5F5F5;
+}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;padding:0}
+
+.page{max-width:720px;margin:0 auto;padding-top:2.5rem;padding:2.5rem 1.5rem 4rem}
+
+/* HEADER */
+.page-header{text-align:center;margin-bottom:2.5rem}
+.topic-label{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-dark);background:var(--blue-light);border:1px solid var(--blue-mid);padding:4px 14px;border-radius:4px;margin-bottom:14px}
+.page-header h1{font-family:'Playfair Display',Georgia,serif;font-size:28px;font-weight:600;color:var(--ink);line-height:1.2;margin-bottom:8px}
+.page-header p{font-size:14px;color:var(--muted);font-style:italic}
+
+/* PROGRESS */
+.progress-wrap{margin-bottom:2rem}
+.progress-meta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px}
+.progress-meta strong{color:var(--blue)}
+.prog-bg{background:#D1D1D1;border-radius:99px;height:6px}
+.prog-fill{background:var(--blue);height:6px;border-radius:99px;transition:width 0.4s ease}
+
+/* SECTION DIVIDER */
+.section-divider{display:flex;align-items:center;gap:12px;margin:2rem 0 1.25rem}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.section-chip{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:4px 14px;border-radius:99px;white-space:nowrap}
+.chip-leo{background:var(--green-bg);color:var(--green);border:1px solid var(--green-mid)}
+.chip-victoria{background:var(--red-bg);color:var(--red);border:1px solid var(--red-mid)}
+.chip-both{background:var(--blue-light);color:var(--blue-dark);border:1px solid var(--blue-mid)}
+
+/* QUESTION CARD */
+.q-card{background:#fff;border:1px solid var(--border);border-radius:6px;padding:20px 22px;margin-bottom:14px}
+.q-card.answered-correct{border-color:var(--green);border-left:4px solid var(--green)}
+.q-card.answered-wrong{border-color:var(--red);border-left:4px solid var(--red)}
+.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.q-num{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.q-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px}
+.badge-leo{background:var(--green-bg);color:var(--green)}
+.badge-victoria{background:var(--red-bg);color:var(--red)}
+.badge-both{background:var(--blue-light);color:var(--blue-dark)}
+.q-text{font-size:15px;font-weight:600;color:var(--ink);line-height:1.5;margin-bottom:14px;font-family:'Source Serif 4',Georgia,serif}
+.q-source{font-size:12px;color:var(--muted);font-style:italic;padding:7px 12px;background:var(--surface);border-radius:4px;border-left:3px solid var(--blue-mid);margin-bottom:14px;line-height:1.6}
+
+/* OPTIONS */
+.mc-options{display:flex;flex-direction:column;gap:7px}
+.mc-opt{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:14px;color:var(--ink);background:#fff;text-align:left;font-family:inherit;width:100%;transition:background 0.12s,border-color 0.12s;line-height:1.4}
+.mc-opt:hover{background:var(--blue-light);border-color:var(--blue)}
+.mc-opt.selected{background:var(--blue-light);border-color:var(--blue);color:var(--blue-dark)}
+.mc-opt.correct{background:var(--green-bg);border-color:var(--green);color:var(--green);cursor:default}
+.mc-opt.wrong{background:var(--red-bg);border-color:var(--red);color:var(--red);cursor:default}
+.mc-opt.reveal{background:var(--green-bg);border-color:var(--green);color:var(--green);cursor:default}
+.mc-opt.disabled{cursor:default;opacity:.65}
+.opt-letter{width:26px;height:26px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:var(--muted);transition:all 0.12s}
+.mc-opt.selected .opt-letter{background:var(--blue);border-color:var(--blue);color:#fff}
+.mc-opt.correct .opt-letter{background:var(--green);border-color:var(--green);color:#fff}
+.mc-opt.wrong .opt-letter{background:var(--red);border-color:var(--red);color:#fff}
+.mc-opt.reveal .opt-letter{background:var(--green);border-color:var(--green);color:#fff}
+
+/* FEEDBACK */
+.q-feedback{margin-top:10px;padding:9px 13px;border-radius:4px;font-size:13px;line-height:1.6;display:none}
+.q-feedback.ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-mid);display:block}
+.q-feedback.err{background:var(--red-bg);color:var(--red);border:1px solid var(--red-mid);display:block}
+
+/* SUBMIT */
+.submit-wrap{margin-top:2rem;text-align:center}
+.submit-btn{padding:12px 44px;background:var(--blue);border:none;border-radius:4px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s}
+.submit-btn:hover{background:var(--blue-dark)}
+
+/* RESULTS */
+.results-card{background:#fff;border:1px solid var(--border);border-radius:6px;padding:2.5rem 2rem;text-align:center;margin-top:2rem;display:none}
+.results-emoji{font-size:48px;margin-bottom:12px}
+.results-score{font-family:'Playfair Display',Georgia,serif;font-size:52px;font-weight:600;color:var(--blue);line-height:1}
+.results-denom{font-size:18px;color:var(--muted);margin-bottom:6px}
+.results-label{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.results-msg{font-size:14px;color:var(--muted);margin-bottom:1.75rem;max-width:400px;margin-left:auto;margin-right:auto}
+.results-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.75rem;max-width:420px;margin-left:auto;margin-right:auto}
+.rb-cell{background:var(--surface);border-radius:4px;padding:12px 8px;text-align:center}
+.rb-num{font-size:22px;font-weight:700;color:var(--blue)}
+.rb-label{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.3}
+.results-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.retry-btn{padding:10px 28px;background:var(--blue);border:none;border-radius:4px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s}
+.retry-btn:hover{background:var(--blue-dark)}
+
+/* NOM */
+.nom-line{margin-top:2.5rem;padding:14px 20px;background:#fff;border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;gap:12px}
+.nom-label{font-size:13px;color:var(--muted);white-space:nowrap}
+.nom-blank{flex:1;border-bottom:1.5px solid var(--blue);height:24px}
+
+.site-nav{background:#0078D4;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:48px;position:sticky;top:0;z-index:100}
+.nav-brand{color:#fff;font-weight:700;font-size:15px;text-decoration:none;font-family:'Segoe UI',Arial,sans-serif}
+.nav-links{display:flex;gap:4px}
+.nav-links a{color:#C7E0F4;font-size:13px;text-decoration:none;padding:6px 12px;border-radius:4px;font-family:'Segoe UI',Arial,sans-serif;transition:background 0.12s}
+.nav-links a:hover,.nav-links a.active{background:rgba(255,255,255,0.15);color:#fff}
+
+.next-bar{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid #E0E0E0;display:flex;justify-content:space-between;align-items:center}
+.next-link{display:inline-block;background:#0078D4;color:#fff;font-size:14px;font-weight:700;text-decoration:none;padding:10px 22px;border-radius:4px;transition:background 0.15s;font-family:'Segoe UI',Arial,sans-serif}
+.next-link:hover{background:#005A9E}
+.back-link{font-size:13px;color:#0078D4;text-decoration:none;font-family:'Segoe UI',Arial,sans-serif}
+.back-link:hover{text-decoration:underline}
+.spacer{flex:1}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="index.html" class="nav-brand">L'uniforme scolaire</a>
+  <div class="nav-links">
+    <a href="index.html">Accueil</a>
+    <a href="debat.html">Lecture</a>
+    <a href="flashcards.html">Cartes éclair</a>
+    <a href="quiz.html" class="active">Quiz</a>
+  </div>
+</nav>
+
+
+<div class="page">
+
+  <div class="page-header">
+    <div class="topic-label">Quiz de compréhension</div>
+    <h1>L'uniforme scolaire : pour ou contre ?</h1>
+    <p>Réponds aux questions sur les lettres de Léo et de Victoria.</p>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span id="progLabel">Question 1 sur 15</span>
+      <strong id="progPct">0 %</strong>
+    </div>
+    <div class="prog-bg"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+
+  <div id="quizBody"></div>
+
+  <div class="submit-wrap">
+    <button class="submit-btn" id="submitBtn" onclick="submitQuiz()">Soumettre mes réponses</button>
+  </div>
+
+  <div class="results-card" id="resultsCard">
+    <div class="results-emoji" id="rEmoji"></div>
+    <div class="results-score" id="rScore"></div>
+    <div class="results-denom" id="rDenom"></div>
+    <div class="results-label" id="rLabel"></div>
+    <div class="results-msg" id="rMsg"></div>
+    <div class="results-breakdown" id="rBreakdown"></div>
+    <div class="results-btns">
+      <button class="retry-btn" onclick="retryQuiz()">Réessayer</button>
+    </div>
+  </div>
+
+  <div class="nom-line">
+    <span class="nom-label">Nom :</span>
+    <div class="nom-blank"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  // ── LEO ──────────────────────────────────────────────
+  {
+    who: "leo", section: "Les arguments de Léo",
+    q: "Selon Léo, pourquoi l'uniforme aide-t-il à l'égalité entre les élèves ?",
+    source: "« Personne ne se moque des vêtements des autres élèves. Tout le monde est égal. »",
+    opts: [
+      "Parce que tout le monde est riche.",
+      "Parce que personne ne regarde les marques de vêtements des autres.",
+      "Parce que les élèves choisissent leurs uniformes ensemble.",
+      "Parce que les profs portent aussi un uniforme."
+    ],
+    answer: 1
+  },
+  {
+    who: "leo", section: null,
+    q: "D'après Léo, comment l'uniforme aide-t-il pendant les sorties scolaires ?",
+    source: "« Les profs nous reconnaissent facilement pendant les sorties scolaires. »",
+    opts: [
+      "Les élèves peuvent se cacher plus facilement.",
+      "Les élèves font moins d'erreurs.",
+      "Les profs reconnaissent facilement les élèves.",
+      "Les parents peuvent identifier leur enfant."
+    ],
+    answer: 2
+  },
+  {
+    who: "leo", section: null,
+    q: "Selon Léo, quel est l'effet de l'uniforme sur les études ?",
+    source: "« On ne perd pas de temps à regarder les vêtements des autres. On pense plus aux études. »",
+    opts: [
+      "Les élèves dorment mieux.",
+      "Les élèves pensent plus aux études et travaillent mieux.",
+      "Les élèves ont moins de devoirs.",
+      "Les élèves parlent plus en classe."
+    ],
+    answer: 1
+  },
+  {
+    who: "leo", section: null,
+    q: "Quel avantage pratique Léo mentionne-t-il pour le matin ?",
+    source: "« Le matin c'est plus simple. On n'a pas besoin de choisir nos vêtements. On gagne du temps. »",
+    opts: [
+      "On peut dormir plus longtemps le soir.",
+      "On mange un meilleur déjeuner.",
+      "On gagne du temps sans choisir ses vêtements.",
+      "On arrive plus tôt à l'école."
+    ],
+    answer: 2
+  },
+  {
+    who: "leo", section: null,
+    q: "Comment Léo décrit-il le sentiment que l'uniforme crée entre les élèves ?",
+    source: "« Quand on porte le même uniforme, on se sent comme une équipe. On est fier de notre école. »",
+    opts: [
+      "On se sent seul et triste.",
+      "On se sent comme une équipe et on est fier de son école.",
+      "On se sent libre d'exprimer sa personnalité.",
+      "On se sent supérieur aux autres écoles."
+    ],
+    answer: 1
+  },
+  // ── VICTORIA ─────────────────────────────────────────
+  {
+    who: "victoria", section: "Les arguments de Victoria",
+    q: "Selon Victoria, pourquoi est-il important de choisir ses vêtements à l'adolescence ?",
+    source: "« Quand on choisit nos vêtements, on peut montrer qui on est. À l'adolescence, c'est important de pouvoir s'exprimer. »",
+    opts: [
+      "Pour dépenser l'argent de ses parents.",
+      "Pour montrer qui on est et s'exprimer.",
+      "Pour impressionner les professeurs.",
+      "Pour suivre la mode du moment."
+    ],
+    answer: 1
+  },
+  {
+    who: "victoria", section: null,
+    q: "D'après Victoria, quel problème les uniformes ont-ils sur le plan du confort ?",
+    source: "« Les uniformes ne sont pas toujours confortables. Parfois, ils sont trop raides ou trop chauds. »",
+    opts: [
+      "Ils sont trop colorés.",
+      "Ils sont trop grands pour les élèves.",
+      "Ils sont parfois trop raides ou trop chauds.",
+      "Ils sont difficiles à laver."
+    ],
+    answer: 2
+  },
+  {
+    who: "victoria", section: null,
+    q: "Selon Victoria, comment les élèves peuvent-ils apprendre à accepter les autres grâce aux vêtements ?",
+    source: "« Quand tout le monde s'habille différemment, on peut parler de nos goûts et apprendre à accepter les autres. »",
+    opts: [
+      "En portant les mêmes vêtements que leurs amis.",
+      "En parlant de leurs goûts et en apprenant à accepter les différences.",
+      "En achetant les vêtements les plus chers.",
+      "En choisissant les mêmes couleurs que leurs professeurs."
+    ],
+    answer: 1
+  },
+  {
+    who: "victoria", section: null,
+    q: "Pourquoi Victoria dit-elle que les uniformes coûtent cher pour les familles ?",
+    source: "« Les enfants et les adolescents grandissent vite. Les parents doivent souvent acheter de nouveaux uniformes. »",
+    opts: [
+      "Parce que les uniformes sont faits de matériaux rares.",
+      "Parce qu'il faut en acheter un nouveau chaque semaine.",
+      "Parce que les enfants grandissent vite et il faut en acheter souvent.",
+      "Parce que les uniformes sont vendus dans des boutiques spéciales."
+    ],
+    answer: 2
+  },
+  {
+    who: "victoria", section: null,
+    q: "Selon Victoria, avec ses propres vêtements, un élève peut s'habiller selon quoi ?",
+    source: "« Avec nos propres vêtements, on peut s'habiller selon la météo ou notre humeur. »",
+    opts: [
+      "Selon les règles de l'école.",
+      "Selon la météo ou son humeur.",
+      "Selon les conseils des professeurs.",
+      "Selon la couleur préférée de ses amis."
+    ],
+    answer: 1
+  },
+  // ── BOTH ─────────────────────────────────────────────
+  {
+    who: "both", section: "Les deux lettres",
+    q: "Dans quel groupe scolaire sont Léo et Victoria ?",
+    source: "Les deux élèves se présentent au début de leur lettre.",
+    opts: [
+      "Le groupe 405",
+      "Le groupe 503",
+      "Le groupe 504",
+      "Le groupe 605"
+    ],
+    answer: 2
+  },
+  {
+    who: "both", section: null,
+    q: "Quelle expression les deux élèves utilisent-ils pour introduire leurs arguments ?",
+    source: "Léo et Victoria utilisent la même structure de texte.",
+    opts: [
+      "« Premièrement... »",
+      "« D'abord... »",
+      "« En premier lieu... »",
+      "« Avant tout... »"
+    ],
+    answer: 1
+  },
+  {
+    who: "both", section: null,
+    q: "Quelle expression les deux élèves utilisent-ils pour commencer leur conclusion ?",
+    source: "La conclusion des deux lettres commence par la même phrase.",
+    opts: [
+      "« Pour terminer... »",
+      "« Finalement... »",
+      "« En conclusion... »",
+      "« Pour conclure... »"
+    ],
+    answer: 2
+  },
+  {
+    who: "both", section: null,
+    q: "Quelle est la position de Léo sur l'uniforme scolaire ?",
+    source: "« Je pense que c'est une bonne idée. »",
+    opts: [
+      "Il est contre l'uniforme.",
+      "Il n'a pas d'opinion.",
+      "Il est pour l'uniforme.",
+      "Il préfère un code vestimentaire."
+    ],
+    answer: 2
+  },
+  {
+    who: "both", section: null,
+    q: "Quelle est la position de Victoria sur l'uniforme scolaire ?",
+    source: "« Je ne suis pas d'accord avec le port de l'uniforme. »",
+    opts: [
+      "Elle est pour l'uniforme.",
+      "Elle est contre l'uniforme.",
+      "Elle pense que ça dépend de l'école.",
+      "Elle n'a pas d'opinion claire."
+    ],
+    answer: 1
+  },
+];
+
+let answers = Array(QUESTIONS.length).fill(null);
+let submitted = false;
+
+function initQuiz() {
+  answers = Array(QUESTIONS.length).fill(null);
+  submitted = false;
+  document.getElementById('resultsCard').style.display = 'none';
+  document.getElementById('submitBtn').style.display = 'inline-block';
+  renderQuiz();
+  updateProgress();
+}
+
+function updateProgress() {
+  const done = answers.filter(a => a !== null).length;
+  const pct = Math.round(done / QUESTIONS.length * 100);
+  document.getElementById('progLabel').textContent = done + ' / ' + QUESTIONS.length + ' questions répondues';
+  document.getElementById('progPct').textContent = pct + ' %';
+  document.getElementById('progFill').style.width = pct + '%';
+}
+
+function renderQuiz() {
+  const body = document.getElementById('quizBody');
+  const letters = ['A','B','C','D'];
+  let html = '';
+  let lastSection = '';
+
+  QUESTIONS.forEach((q, i) => {
+    if (q.section && q.section !== lastSection) {
+      const chipCls = q.who === 'leo' ? 'chip-leo' : q.who === 'victoria' ? 'chip-victoria' : 'chip-both';
+      html += `<div class="section-divider"><span class="section-chip ${chipCls}">${q.section}</span></div>`;
+      lastSection = q.section;
+    }
+
+    const sel = answers[i];
+    let cardCls = 'q-card';
+    if (submitted) {
+      cardCls += sel === q.answer ? ' answered-correct' : ' answered-wrong';
+    }
+
+    const badgeCls = q.who === 'leo' ? 'badge-leo' : q.who === 'victoria' ? 'badge-victoria' : 'badge-both';
+    const badgeTxt = q.who === 'leo' ? 'Léo' : q.who === 'victoria' ? 'Victoria' : 'Les deux';
+
+    let optsHtml = '';
+    q.opts.forEach((opt, oi) => {
+      let cls = 'mc-opt';
+      if (submitted) {
+        if (oi === q.answer) cls += ' correct';
+        else if (sel === oi) cls += ' wrong';
+        else cls += ' disabled';
+      } else if (sel === oi) cls += ' selected';
+      optsHtml += `<button class="${cls}" onclick="pick(${i},${oi})"><span class="opt-letter">${letters[oi]}</span>${opt}</button>`;
+    });
+
+    let feedbackHtml = '';
+    if (submitted) {
+      if (sel === q.answer) {
+        feedbackHtml = `<div class="q-feedback ok">✓ Correct !</div>`;
+      } else if (sel === null) {
+        feedbackHtml = `<div class="q-feedback err">Tu n'as pas répondu. La bonne réponse était : <strong>${q.opts[q.answer]}</strong></div>`;
+      } else {
+        feedbackHtml = `<div class="q-feedback err">La bonne réponse est : <strong>${q.opts[q.answer]}</strong></div>`;
+      }
+    }
+
+    html += `
+      <div class="${cardCls}" id="qcard-${i}">
+        <div class="q-meta">
+          <span class="q-num">Question ${i + 1}</span>
+          <span class="q-badge ${badgeCls}">${badgeTxt}</span>
+        </div>
+        <div class="q-text">${q.q}</div>
+        <div class="q-source">${q.source}</div>
+        <div class="mc-options">${optsHtml}</div>
+        ${feedbackHtml}
+      </div>`;
+  });
+
+  body.innerHTML = html;
+}
+
+function pick(qi, oi) {
+  if (submitted) return;
+  answers[qi] = oi;
+  renderQuiz();
+  updateProgress();
+}
+
+function submitQuiz() {
+  submitted = true;
+  const score = QUESTIONS.filter((q, i) => answers[i] === q.answer).length;
+  renderQuiz();
+  document.getElementById('submitBtn').style.display = 'none';
+  document.getElementById('progFill').style.width = '100%';
+  document.getElementById('progLabel').textContent = 'Quiz terminé !';
+  document.getElementById('progPct').textContent = Math.round(score / QUESTIONS.length * 100) + ' %';
+  showResults(score);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showResults(score) {
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  const leo_t = QUESTIONS.filter(q => q.who === 'leo').length;
+  const vic_t = QUESTIONS.filter(q => q.who === 'victoria').length;
+  const both_t = QUESTIONS.filter(q => q.who === 'both').length;
+  const leo_s = QUESTIONS.filter((q, i) => q.who === 'leo' && answers[i] === q.answer).length;
+  const vic_s = QUESTIONS.filter((q, i) => q.who === 'victoria' && answers[i] === q.answer).length;
+  const both_s = QUESTIONS.filter((q, i) => q.who === 'both' && answers[i] === q.answer).length;
+
+  let emoji, label, msg;
+  if (pct >= 90) { emoji = '🏆'; label = 'Excellent travail !'; msg = 'Tu as très bien compris les deux lettres. Bravo !'; }
+  else if (pct >= 70) { emoji = '👍'; label = 'Bien joué !'; msg = 'Tu as bien compris les lettres. Relis les questions manquées.'; }
+  else if (pct >= 50) { emoji = '📖'; label = 'Pas mal !'; msg = 'Relis les lettres attentivement, puis réessaie.'; }
+  else { emoji = '💪'; label = 'Continue à pratiquer !'; msg = 'Relis les deux lettres et essaie à nouveau !'; }
+
+  document.getElementById('rEmoji').textContent = emoji;
+  document.getElementById('rScore').textContent = score;
+  document.getElementById('rDenom').textContent = '/ ' + total + ' points';
+  document.getElementById('rLabel').textContent = label;
+  document.getElementById('rMsg').textContent = msg;
+  document.getElementById('rBreakdown').innerHTML =
+    `<div class="rb-cell"><div class="rb-num" style="color:var(--green)">${leo_s}/${leo_t}</div><div class="rb-label">Questions sur Léo</div></div>` +
+    `<div class="rb-cell"><div class="rb-num" style="color:var(--red)">${vic_s}/${vic_t}</div><div class="rb-label">Questions sur Victoria</div></div>` +
+    `<div class="rb-cell"><div class="rb-num" style="color:var(--blue)">${both_s}/${both_t}</div><div class="rb-label">Questions générales</div></div>`;
+  document.getElementById('resultsCard').style.display = 'block';
+  document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function retryQuiz() {
+  initQuiz();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+initQuiz();
+</script>
+</body>
+</html>
