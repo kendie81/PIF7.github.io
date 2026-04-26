@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activités de vocabulaire – Nos vacances</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#F5F5F5;min-height:100vh;padding:2rem 1rem;color:#242424}
+  .container{max-width:660px;margin:0 auto}
+  h1{font-size:20px;font-weight:600;color:#005A9E;margin-bottom:4px}
+  .subtitle{font-size:13px;color:#616161;margin-bottom:1.5rem}
+  .tab-row{display:flex;border-bottom:2px solid #D1D1D1;margin-bottom:1.75rem;gap:4px}
+  .tab{padding:10px 22px;font-size:14px;border:none;background:transparent;cursor:pointer;color:#616161;border-bottom:3px solid transparent;margin-bottom:-2px;font-family:inherit;transition:color 0.15s}
+  .tab.active{color:#0078D4;border-bottom:3px solid #0078D4;font-weight:600}
+  .tab:hover{color:#005A9E;background:#EFF6FC;border-radius:4px 4px 0 0}
+  .section{display:none}.section.active{display:block}
+  .score-strip{display:flex;gap:10px;margin-bottom:1.25rem}
+  .score-pill{padding:5px 14px;border-radius:4px;font-size:13px;background:#EFF6FC;color:#005A9E;border:1px solid #C7E0F4}
+  .score-pill span{font-weight:600}
+  .section-label{font-size:12px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:#616161;margin-bottom:10px}
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem}
+  .match-col{display:flex;flex-direction:column;gap:8px}
+  .match-item{padding:10px 14px;border-radius:4px;border:1px solid #D1D1D1;background:#fff;font-size:14px;cursor:pointer;color:#242424;text-align:left;transition:background 0.12s,border-color 0.12s;min-height:44px;display:flex;align-items:center;font-family:inherit;width:100%}
+  .match-item:hover{background:#EFF6FC;border-color:#0078D4}
+  .match-item.selected{background:#EFF6FC;border-color:#0078D4;color:#005A9E;font-weight:600}
+  .match-item.correct{background:#DFF6DD;border-color:#107C10;color:#107C10;cursor:default;font-weight:600}
+  .match-item.wrong{background:#FDE7E9;border-color:#A4262C;color:#A4262C}
+  .match-item.disabled{opacity:0.55;cursor:default}
+  .btn-row{display:flex;gap:10px;margin-bottom:1.25rem;flex-wrap:wrap}
+  .btn{padding:8px 20px;border-radius:4px;border:1px solid #D1D1D1;background:#fff;color:#242424;font-size:14px;cursor:pointer;font-family:inherit;transition:background 0.15s}
+  .btn:hover{background:#F5F5F5;border-color:#999}
+  .btn-primary{background:#0078D4;border-color:#0078D4;color:#fff}
+  .btn-primary:hover{background:#005A9E;border-color:#005A9E}
+  .fitb-list{display:flex;flex-direction:column;gap:14px;margin-bottom:1.5rem}
+  .fitb-item{padding:14px 16px;border-radius:4px;border:1px solid #D1D1D1;background:#fff}
+  .fitb-sentence{font-size:15px;color:#242424;margin-bottom:10px;line-height:1.7}
+  .fitb-choices{display:flex;flex-wrap:wrap;gap:7px}
+  .fitb-choice{padding:5px 14px;border-radius:4px;border:1px solid #D1D1D1;background:#F5F5F5;font-size:13px;cursor:pointer;color:#242424;transition:background 0.12s;font-family:inherit}
+  .fitb-choice:hover{background:#EFF6FC;border-color:#0078D4}
+  .fitb-choice.chosen{background:#EFF6FC;border-color:#0078D4;color:#005A9E;font-weight:600}
+  .fitb-choice.correct{background:#DFF6DD;border-color:#107C10;color:#107C10;cursor:default;font-weight:600}
+  .fitb-choice.wrong{background:#FDE7E9;border-color:#A4262C;color:#A4262C}
+  .fitb-choice.disabled{opacity:0.5;cursor:default}
+  .blank{display:inline-block;min-width:90px;border-bottom:2px solid #0078D4;margin:0 4px;vertical-align:bottom;text-align:center;font-weight:600;color:#0078D4;font-size:15px;line-height:1.5}
+  .feedback{font-size:12px;margin-top:8px}
+  .feedback.ok{color:#107C10;font-weight:600}
+  .feedback.err{color:#A4262C}
+  .done-box{text-align:center;padding:2rem 1rem;border-radius:4px;background:#EFF6FC;border:1px solid #C7E0F4;margin-bottom:1rem}
+  .done-box h3{font-size:20px;font-weight:600;margin-bottom:6px;color:#005A9E}
+  .done-box p{font-size:14px;color:#616161}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Activités de vocabulaire – Nos vacances</h1>
+  <p class="subtitle">Échange de courriels : Marc et Sophie | CECR A1.2 / A2.1</p>
+
+  <div class="tab-row">
+    <button class="tab active" onclick="switchTab('match')">Association</button>
+    <button class="tab" onclick="switchTab('fitb')">Phrases à compléter</button>
+  </div>
+
+  <div id="match" class="section active"></div>
+  <div id="fitb" class="section"></div>
+</div>
+
+<script>
+const VOCAB=[
+  {fr:"les vacances",en:"les congés / les fêtes"},
+  {fr:"le chalet",en:"la maison de campagne"},
+  {fr:"la plage",en:"le bord de mer / le sable"},
+  {fr:"l'océan",en:"la mer / les eaux salées"},
+  {fr:"la forêt",en:"les bois / les arbres"},
+  {fr:"le lac",en:"l'étendue d'eau douce"},
+  {fr:"nager",en:"se baigner dans l'eau"},
+  {fr:"faire du canot",en:"pagayer sur l'eau"},
+  {fr:"une randonnée",en:"une marche en nature"},
+  {fr:"un pique-nique",en:"un repas en plein air"},
+  {fr:"le feu de camp",en:"les flammes en forêt"},
+  {fr:"les fruits de mer",en:"les crevettes et homards"},
+  {fr:"les glaces",en:"la crème glacée"},
+  {fr:"les guimauves",en:"les bonbons mous et sucrés"},
+  {fr:"le coucher de soleil",en:"la fin du jour colorée"},
+  {fr:"calme",en:"tranquille / paisible"},
+  {fr:"délicieux",en:"très bon / savoureux"},
+  {fr:"magnifique",en:"très beau / splendide"},
+  {fr:"agréable",en:"plaisant / sympa"},
+  {fr:"relaxant",en:"reposant / sans stress"},
+];
+const FITB_Q=[
+  {sent:"Le matin, on va à la ___ pour nager dans l'océan.",blank:"plage",choices:["forêt","plage","lac","chalet"]},
+  {sent:"On est dans notre ___ près de la plage.",blank:"chalet",choices:["randonnée","pique-nique","chalet","feu de camp"]},
+  {sent:"L'eau est un peu froide, mais c'est ___.",blank:"agréable",choices:["magnifique","délicieux","agréable","relaxant"]},
+  {sent:"Le soir, on regarde le ___ de soleil.",blank:"coucher",choices:["lever","coucher","courant","couleur"]},
+  {sent:"On mange beaucoup de ___ de mer.",blank:"fruits",choices:["fruits","légumes","oiseaux","animaux"]},
+  {sent:"Le matin, on fait du ___ sur le lac.",blank:"canot",choices:["randonnée","canot","pique-nique","sable"]},
+  {sent:"L'après-midi, on fait des ___ dans la forêt.",blank:"randonnées",choices:["canots","glaces","guimauves","randonnées"]},
+  {sent:"Le soir, on fait un ___ de camp et on mange des guimauves.",blank:"feu",choices:["feu","pique-nique","coucher","canot"]},
+  {sent:"C'est très ___ et relaxant ici.",blank:"confortable",choices:["froide","confortable","calme","magnifique"]},
+  {sent:"On voit beaucoup d'___ et de petits animaux.",blank:"oiseaux",choices:["oiseaux","arbres","nuages","glaces"]},
+  {sent:"Le lac est très ___ — parfait pour le canot.",blank:"calme",choices:["délicieux","calme","magnifique","froide"]},
+  {sent:"Les fruits de mer sont ___ !",blank:"délicieux",choices:["froids","calmes","délicieux","relaxants"]},
+];
+
+function shuffle(a){let b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b;}
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',['match','fitb'][i]===t));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(t).classList.add('active');
+}
+
+var ms={};
+function initMatch(){
+  const pool=shuffle(VOCAB).slice(0,8);
+  ms={pool,frItems:shuffle(pool.map(x=>x.fr)),enItems:shuffle(pool.map(x=>x.en)),sel:null,selSide:null,matched:[],wrong:[],score:0,done:false};
+  renderMatch();
+}
+function renderMatch(){
+  const el=document.getElementById('match');
+  if(ms.done){el.innerHTML=`<div class="done-box"><h3>Activité terminée !</h3><p>Tu as associé ${ms.score} paires sur ${ms.pool.length} correctement.</p></div><div class="btn-row"><button class="btn btn-primary" onclick="initMatch()">Nouvel exercice</button></div>`;return;}
+  const frH=ms.frItems.map(w=>{let c='match-item';if(ms.matched.includes(w))c+=' correct disabled';else if(ms.selSide==='fr'&&ms.sel===w)c+=' selected';else if(ms.wrong.includes('fr:'+w))c+=' wrong';return `<button class="${c}" onclick="mClick('fr','${w.replace(/'/g,"\\'")}')">${w}</button>`;}).join('');
+  const enH=ms.enItems.map(w=>{const fm=ms.pool.find(x=>x.en===w)?.fr;let c='match-item';if(ms.matched.includes(fm))c+=' correct disabled';else if(ms.selSide==='en'&&ms.sel===w)c+=' selected';else if(ms.wrong.includes('en:'+w))c+=' wrong';return `<button class="${c}" onclick="mClick('en','${w.replace(/'/g,"\\'")}')">${w}</button>`;}).join('');
+  el.innerHTML=`<div class="score-strip"><div class="score-pill">Paires : <span>${ms.score}/${ms.pool.length}</span></div><div class="score-pill">Restantes : <span>${ms.pool.length-ms.score}</span></div></div><p class="section-label">Associe le mot français avec sa définition</p><div class="match-grid"><div class="match-col">${frH}</div><div class="match-col">${enH}</div></div><div class="btn-row"><button class="btn" onclick="initMatch()">Recommencer</button></div>`;
+}
+function mClick(side,word){
+  const fm=side==='en'?ms.pool.find(x=>x.en===word)?.fr:word;
+  if(ms.matched.includes(fm))return;
+  if(ms.sel===null){ms.sel=word;ms.selSide=side;renderMatch();return;}
+  if(ms.selSide===side){ms.sel=word;renderMatch();return;}
+  const frW=side==='fr'?word:ms.sel,enW=side==='en'?word:ms.sel;
+  if(ms.pool.find(x=>x.fr===frW&&x.en===enW)){
+    ms.matched.push(frW);ms.score++;ms.sel=null;ms.selSide=null;
+    if(ms.score===ms.pool.length)ms.done=true;
+    renderMatch();
+  } else {
+    ms.wrong=['fr:'+frW,'en:'+enW];ms.sel=null;ms.selSide=null;
+    renderMatch();setTimeout(()=>{ms.wrong=[];renderMatch();},900);
+  }
+}
+
+var fs={};
+function initFitb(){
+  const pool=shuffle(FITB_Q).slice(0,8);
+  fs={pool,answers:Array(pool.length).fill(null),submitted:false,score:0};
+  renderFitb();
+}
+function renderFitb(){
+  const el=document.getElementById('fitb');
+  const items=fs.pool.map((q,i)=>{
+    const ch=fs.answers[i];
+    const cH=q.choices.map(c=>{let cls='fitb-choice';if(fs.submitted){if(c===q.blank)cls+=' correct';else if(c===ch&&ch!==q.blank)cls+=' wrong';else cls+=' disabled';}else if(c===ch)cls+=' chosen';return `<button class="${cls}" onclick="fChoose(${i},'${c.replace(/'/g,"\\'")}')">${c}</button>`;}).join('');
+    let fb='';if(fs.submitted){fb=ch===q.blank?'<div class="feedback ok">Correct !</div>':`<div class="feedback err">La bonne réponse est : ${q.blank}</div>`;}
+    const parts=q.sent.split('___');
+    return `<div class="fitb-item"><div class="fitb-sentence">${parts[0]}<span class="blank">${ch||''}</span>${parts[1]}</div><div class="fitb-choices">${cH}</div>${fb}</div>`;
+  }).join('');
+  const btnH=fs.submitted?`<div class="btn-row"><button class="btn btn-primary" onclick="initFitb()">Nouvel exercice</button></div>`:`<div class="btn-row"><button class="btn btn-primary" onclick="submitFitb()">Vérifier mes réponses</button><button class="btn" onclick="initFitb()">Recommencer</button></div>`;
+  el.innerHTML=`<div class="score-strip"><div class="score-pill">Bonnes réponses : <span>${fs.score}/${fs.pool.length}</span></div></div><p class="section-label">Choisis le bon mot pour compléter chaque phrase</p><div class="fitb-list">${items}</div>${btnH}`;
+}
+function fChoose(i,c){if(fs.submitted)return;fs.answers[i]=c;renderFitb();}
+function submitFitb(){fs.submitted=true;fs.score=fs.pool.filter((q,i)=>fs.answers[i]===q.blank).length;renderFitb();}
+
+initMatch();
+initFitb();
+</script>
+</body>
+</html>

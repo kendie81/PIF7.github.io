@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cartes éclair – Nos vacances</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#F5F5F5;min-height:100vh;padding:2rem 1rem;color:#242424}
+  .container{max-width:600px;margin:0 auto}
+  h1{font-size:20px;font-weight:600;color:#005A9E;margin-bottom:4px}
+  .subtitle{font-size:13px;color:#616161;margin-bottom:1.5rem}
+  .category-filter{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.25rem}
+  .cat-btn{padding:5px 14px;border-radius:4px;border:1px solid #D1D1D1;background:#fff;font-size:12px;cursor:pointer;color:#616161;font-family:inherit;transition:all 0.15s}
+  .cat-btn.active{background:#0078D4;border-color:#0078D4;color:#fff;font-weight:600}
+  .cat-btn:hover:not(.active){background:#EFF6FC;border-color:#0078D4;color:#005A9E}
+  .score-strip{display:flex;gap:10px;margin-bottom:1rem}
+  .score-pill{padding:5px 14px;border-radius:4px;font-size:13px;background:#EFF6FC;color:#005A9E;border:1px solid #C7E0F4}
+  .score-pill span{font-weight:600}
+  .progress-label{font-size:13px;color:#616161;margin-bottom:6px;display:flex;justify-content:space-between}
+  .progress-bar-bg{background:#D1D1D1;border-radius:99px;height:6px;margin-bottom:1.5rem}
+  .progress-bar-fill{background:#0078D4;height:6px;border-radius:99px;transition:width 0.4s ease}
+  .card-scene{perspective:900px;height:210px;margin-bottom:1.5rem;cursor:pointer}
+  .card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform 0.55s cubic-bezier(.4,0,.2,1)}
+  .card-inner.flipped{transform:rotateY(180deg)}
+  .card-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:6px;border:1px solid #D1D1D1;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;box-sizing:border-box}
+  .card-back{transform:rotateY(180deg);background:#EFF6FC;border-color:#C7E0F4}
+  .card-tag{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#616161;margin-bottom:0.75rem}
+  .card-word{font-size:28px;font-weight:600;color:#242424;text-align:center}
+  .card-translation{font-size:22px;font-weight:600;color:#0078D4;text-align:center;margin-bottom:0.5rem}
+  .card-example{font-size:13px;color:#616161;text-align:center;font-style:italic;margin-top:0.5rem}
+  .card-hint{font-size:12px;color:#A0A0A0;margin-top:1rem}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-bottom:1.5rem}
+  .btn{padding:8px 22px;border-radius:4px;border:1px solid #D1D1D1;background:#fff;color:#242424;font-size:14px;cursor:pointer;font-family:inherit;transition:background 0.15s}
+  .btn:hover{background:#F5F5F5;border-color:#999}
+  .btn-primary{background:#0078D4;border-color:#0078D4;color:#fff}
+  .btn-primary:hover{background:#005A9E;border-color:#005A9E}
+  .done-msg{text-align:center;padding:2rem;background:#EFF6FC;border:1px solid #C7E0F4;border-radius:6px;margin-bottom:1rem}
+  .done-msg h3{font-size:20px;font-weight:600;margin-bottom:0.5rem;color:#005A9E}
+  .done-msg p{color:#616161;font-size:14px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Cartes éclair – Nos vacances</h1>
+  <p class="subtitle">Échange de courriels : Marc et Sophie | CECR A1.2 / A2.1</p>
+  <div class="category-filter" id="catFilter"></div>
+  <div class="score-strip">
+    <div class="score-pill">Connus : <span id="knownCount">0</span></div>
+    <div class="score-pill">Restants : <span id="leftCount">0</span></div>
+  </div>
+  <div class="progress-label">
+    <span id="cardNum"></span>
+    <span id="pct"></span>
+  </div>
+  <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+  <div class="card-scene" id="cardScene" onclick="flipCard()" title="Cliquer pour retourner la carte">
+    <div class="card-inner" id="cardInner">
+      <div class="card-face" id="cardFront">
+        <div class="card-tag" id="frontTag">mot</div>
+        <div class="card-word" id="frontWord"></div>
+        <div class="card-hint">Cliquer pour voir la traduction</div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-tag">traduction</div>
+        <div class="card-translation" id="backTranslation"></div>
+        <div class="card-example" id="backExample"></div>
+      </div>
+    </div>
+  </div>
+  <div class="btn-row" id="btnRow">
+    <button class="btn" onclick="skipCard()">Encore ↻</button>
+    <button class="btn btn-primary" onclick="markKnown()">Je connais ce mot ✓</button>
+  </div>
+  <div class="done-msg" id="doneMsg" style="display:none">
+    <h3 id="doneTitle"></h3>
+    <p id="doneBody"></p>
+    <br>
+    <button class="btn btn-primary" onclick="restart()">Recommencer</button>
+  </div>
+</div>
+
+<script>
+const ALL_CARDS=[
+  {fr:"les vacances",en:"vacation / holidays",cat:"Thème",ex:"Je suis en vacances avec ma famille."},
+  {fr:"le chalet",en:"cottage / cabin",cat:"Logement",ex:"On est dans notre chalet près de la plage."},
+  {fr:"la plage",en:"beach",cat:"Nature",ex:"Le matin, on va à la plage pour nager."},
+  {fr:"l'océan",en:"ocean",cat:"Nature",ex:"On nage dans l'océan."},
+  {fr:"la forêt",en:"forest",cat:"Nature",ex:"Notre chalet est dans la forêt."},
+  {fr:"le lac",en:"lake",cat:"Nature",ex:"On fait du canot sur le lac."},
+  {fr:"nager",en:"to swim",cat:"Activités",ex:"On nage dans l'océan chaque matin."},
+  {fr:"faire du canot",en:"to go canoeing",cat:"Activités",ex:"Le matin, on fait du canot sur le lac."},
+  {fr:"une randonnée",en:"a hike",cat:"Activités",ex:"L'après-midi, on fait des randonnées."},
+  {fr:"un pique-nique",en:"a picnic",cat:"Activités",ex:"On fait un pique-nique près de l'eau."},
+  {fr:"le feu de camp",en:"campfire",cat:"Activités",ex:"Le soir, on fait un feu de camp."},
+  {fr:"les fruits de mer",en:"seafood",cat:"Nourriture",ex:"On mange beaucoup de fruits de mer."},
+  {fr:"les glaces",en:"ice cream",cat:"Nourriture",ex:"L'après-midi, on mange des glaces."},
+  {fr:"les guimauves",en:"marshmallows",cat:"Nourriture",ex:"On mange des guimauves au feu de camp."},
+  {fr:"le coucher de soleil",en:"sunset",cat:"Nature",ex:"Le soir, on regarde le coucher de soleil."},
+  {fr:"le sable",en:"sand",cat:"Nature",ex:"On marche sur le sable."},
+  {fr:"calme",en:"calm / quiet",cat:"Adjectifs",ex:"L'eau du lac est très calme."},
+  {fr:"tranquille",en:"peaceful / quiet",cat:"Adjectifs",ex:"C'est très calme et tranquille ici."},
+  {fr:"délicieux",en:"delicious",cat:"Adjectifs",ex:"Les fruits de mer sont délicieux !"},
+  {fr:"magnifique",en:"magnificent / beautiful",cat:"Adjectifs",ex:"Le coucher de soleil, c'est magnifique !"},
+  {fr:"agréable",en:"pleasant / enjoyable",cat:"Adjectifs",ex:"L'eau est froide, mais c'est agréable."},
+  {fr:"relaxant",en:"relaxing",cat:"Adjectifs",ex:"C'est très confortable et relaxant."},
+  {fr:"le matin",en:"in the morning",cat:"Temps",ex:"Le matin, on va à la plage."},
+  {fr:"l'après-midi",en:"in the afternoon",cat:"Temps",ex:"L'après-midi, on fait des randonnées."},
+  {fr:"le soir",en:"in the evening",cat:"Temps",ex:"Le soir, on fait un feu de camp."},
+  {fr:"près de",en:"near / close to",cat:"Expressions",ex:"Le chalet est près de la plage."},
+  {fr:"beaucoup de",en:"a lot of / many",cat:"Expressions",ex:"On voit beaucoup d'oiseaux."},
+  {fr:"un oiseau",en:"a bird",cat:"Nature",ex:"On voit beaucoup d'oiseaux dans la forêt."},
+];
+const CATS=[...new Set(ALL_CARDS.map(c=>c.cat))];
+let activeCats=new Set(CATS),deck=[],current=0,known=0,flipped=false;
+function buildDeck(){deck=ALL_CARDS.filter(c=>activeCats.has(c.cat)).slice();shuffle(deck);current=0;known=0;flipped=false;document.getElementById('cardInner').classList.remove('flipped');document.getElementById('doneMsg').style.display='none';document.getElementById('cardScene').style.display='block';document.getElementById('btnRow').style.display='flex';updateUI();}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
+function total(){return ALL_CARDS.filter(c=>activeCats.has(c.cat)).length;}
+function updateUI(){
+  if(deck.length===0||current>=deck.length){showDone();return;}
+  const c=deck[current];
+  document.getElementById('frontTag').textContent=c.cat;
+  document.getElementById('frontWord').textContent=c.fr;
+  document.getElementById('backTranslation').textContent=c.en;
+  document.getElementById('backExample').textContent=c.ex;
+  document.getElementById('cardNum').textContent=`Carte ${current+1} sur ${deck.length}`;
+  document.getElementById('pct').textContent=Math.round((known/total())*100)+'%';
+  document.getElementById('progressBar').style.width=(known/total()*100)+'%';
+  document.getElementById('knownCount').textContent=known;
+  document.getElementById('leftCount').textContent=deck.length-current;
+}
+function flipCard(){flipped=!flipped;document.getElementById('cardInner').classList.toggle('flipped',flipped);}
+function markKnown(){deck.splice(current,1);known++;flipped=false;document.getElementById('cardInner').classList.remove('flipped');updateUI();}
+function skipCard(){const c=deck.splice(current,1)[0];deck.push(c);flipped=false;document.getElementById('cardInner').classList.remove('flipped');if(current>=deck.length)current=0;updateUI();}
+function showDone(){document.getElementById('cardScene').style.display='none';document.getElementById('btnRow').style.display='none';document.getElementById('progressBar').style.width='100%';document.getElementById('pct').textContent='100%';document.getElementById('knownCount').textContent=known;document.getElementById('leftCount').textContent=0;const t=total();document.getElementById('doneTitle').textContent=known>=t?'Excellent travail !':'Bien joué — '+known+' sur '+t+' mots appris !';document.getElementById('doneBody').textContent=known>=t?'Tu connais tous les mots de cette catégorie !':'Continue à pratiquer pour maîtriser tous les mots.';document.getElementById('doneMsg').style.display='block';}
+function restart(){buildDeck();}
+function renderCatButtons(){const f=document.getElementById('catFilter');f.innerHTML='';CATS.forEach(cat=>{const b=document.createElement('button');b.className='cat-btn'+(activeCats.has(cat)?' active':'');b.textContent=cat;b.onclick=()=>{if(activeCats.has(cat)){if(activeCats.size>1)activeCats.delete(cat);}else{activeCats.add(cat);}renderCatButtons();buildDeck();};f.appendChild(b);});}
+renderCatButtons();
+buildDeck();
+</script>
+</body>
+</html>

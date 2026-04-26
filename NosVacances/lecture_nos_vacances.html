@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture – Nos vacances</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#F5F5F5;min-height:100vh;padding:2rem 1rem;color:#242424}
+  .page{max-width:660px;margin:0 auto}
+
+  .page-header{margin-bottom:2rem}
+  .page-header h1{font-size:22px;font-weight:700;color:#005A9E;margin-bottom:4px}
+  .page-header p{font-size:13px;color:#616161}
+  .badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600;background:#EFF6FC;color:#005A9E;border:1px solid #C7E0F4;margin-top:8px;margin-right:6px}
+
+  .inbox-pane{background:#fff;border:1px solid #D1D1D1;border-radius:6px;overflow:hidden;margin-bottom:2rem}
+  .inbox-header{background:#0078D4;padding:10px 16px;display:flex;align-items:center;gap:10px}
+  .inbox-header-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center}
+  .inbox-header-icon svg{width:18px;height:18px;fill:#fff}
+  .inbox-title{font-size:14px;font-weight:600;color:#fff}
+  .inbox-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid #F0F0F0;cursor:pointer;transition:background 0.12s}
+  .inbox-row:last-child{border-bottom:none}
+  .inbox-row:hover{background:#EFF6FC}
+  .inbox-row.active{background:#EFF6FC;border-left:3px solid #0078D4;padding-left:13px}
+  .avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+  .avatar-m{background:#C7E0F4;color:#005A9E}
+  .avatar-s{background:#DFF6DD;color:#107C10}
+  .inbox-meta{flex:1;min-width:0}
+  .inbox-from{font-size:13px;font-weight:600;color:#242424;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .inbox-subject{font-size:12px;color:#616161;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .inbox-time{font-size:11px;color:#A0A0A0;flex-shrink:0}
+
+  .email-card{background:#fff;border:1px solid #D1D1D1;border-radius:6px;margin-bottom:1.5rem;overflow:hidden}
+  .email-header{padding:16px 20px 14px;border-bottom:1px solid #F0F0F0}
+  .email-subject{font-size:16px;font-weight:700;color:#242424;margin-bottom:12px}
+  .email-meta-row{display:flex;align-items:flex-start;gap:12px}
+  .email-body{padding:20px;font-size:15px;line-height:1.8;color:#242424}
+  .email-body p{margin-bottom:1rem}
+  .email-body p:last-child{margin-bottom:0}
+  .email-sig{margin-top:1.25rem;padding-top:1rem;border-top:1px solid #F0F0F0;font-size:14px;color:#616161}
+  .meta-name{font-size:14px;font-weight:600;color:#242424}
+  .meta-addr{font-size:12px;color:#0078D4}
+  .meta-to{font-size:12px;color:#616161;margin-top:1px}
+  .reply-badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:600;background:#EFF6FC;color:#005A9E;border:1px solid #C7E0F4;margin-left:8px;vertical-align:middle}
+
+  .thread-line{display:flex;align-items:center;gap:10px;margin:0 0 1.5rem;color:#A0A0A0;font-size:12px}
+  .thread-line::before,.thread-line::after{content:'';flex:1;height:1px;background:#E0E0E0}
+
+  .vocab-box{background:#EFF6FC;border:1px solid #C7E0F4;border-radius:6px;padding:16px 20px;margin-bottom:2rem}
+  .vocab-box-title{font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#005A9E;margin-bottom:10px}
+  .vocab-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px}
+  .vocab-item{font-size:13px;color:#242424;padding:4px 0}
+  .vocab-item strong{color:#005A9E;font-weight:600}
+
+  .nom-line{margin-top:2rem;padding:14px 20px;background:#fff;border:1px solid #D1D1D1;border-radius:6px;display:flex;align-items:center;gap:12px}
+  .nom-label{font-size:13px;color:#616161;white-space:nowrap}
+  .nom-blank{flex:1;border-bottom:1.5px solid #0078D4;height:24px}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <h1>Échange de courriels : Nos vacances</h1>
+    <p>Lis les deux courriels entre Marc et Sophie.</p>
+    <span class="badge">CECR A1.2</span>
+    <span class="badge">A2.1</span>
+  </div>
+
+  <div class="inbox-pane">
+    <div class="inbox-header">
+      <div class="inbox-header-icon">
+        <svg viewBox="0 0 20 20"><path d="M2 4a2 2 0 012-2h12a2 2 0 012 2v.5l-8 5-8-5V4zm0 2.17V16a2 2 0 002 2h12a2 2 0 002-2V6.17l-8 5-8-5z"/></svg>
+      </div>
+      <span class="inbox-title">Boîte de réception</span>
+    </div>
+    <div class="inbox-row active">
+      <div class="avatar avatar-m">MT</div>
+      <div class="inbox-meta">
+        <div class="inbox-from">Marc Tremblay</div>
+        <div class="inbox-subject">Coucou de Tracadie !</div>
+      </div>
+      <div class="inbox-time">Courriel 1</div>
+    </div>
+    <div class="inbox-row">
+      <div class="avatar avatar-s">SL</div>
+      <div class="inbox-meta">
+        <div class="inbox-from">Sophie Leblanc</div>
+        <div class="inbox-subject">Ré : Coucou de Tracadie !</div>
+      </div>
+      <div class="inbox-time">Courriel 2</div>
+    </div>
+  </div>
+
+  <div class="email-card">
+    <div class="email-header">
+      <div class="email-subject">Coucou de Tracadie !</div>
+      <div class="email-meta-row">
+        <div class="avatar avatar-m" style="width:40px;height:40px;font-size:14px">MT</div>
+        <div>
+          <div class="meta-name">Marc Tremblay</div>
+          <div class="meta-addr">marc.tremblay@email.ca</div>
+          <div class="meta-to">À : Sophie Leblanc &lt;sophie.leblanc@email.ca&gt;</div>
+        </div>
+      </div>
+    </div>
+    <div class="email-body">
+      <p>Salut Sophie !</p>
+      <p>Comment ça va ? Moi, ça va super bien !</p>
+      <p>Je suis en vacances avec ma famille à Tracadie. On est dans notre chalet près de la plage. Il fait très beau et il fait chaud. Le matin, on va à la plage pour nager dans l'océan. L'eau est un peu froide, mais c'est agréable !</p>
+      <p>L'après-midi, on mange des glaces ou on marche sur le sable. Le soir, on regarde le coucher de soleil. C'est magnifique ! On mange aussi beaucoup de fruits de mer. C'est délicieux.</p>
+      <p>Et toi ? Où es-tu en vacances ?</p>
+      <div class="email-sig">À bientôt,<br><strong>Marc</strong></div>
+    </div>
+  </div>
+
+  <div class="thread-line">réponse</div>
+
+  <div class="email-card">
+    <div class="email-header">
+      <div class="email-subject">Ré : Coucou de Tracadie ! <span class="reply-badge">réponse</span></div>
+      <div class="email-meta-row">
+        <div class="avatar avatar-s" style="width:40px;height:40px;font-size:14px">SL</div>
+        <div>
+          <div class="meta-name">Sophie Leblanc</div>
+          <div class="meta-addr">sophie.leblanc@email.ca</div>
+          <div class="meta-to">À : Marc Tremblay &lt;marc.tremblay@email.ca&gt;</div>
+        </div>
+      </div>
+    </div>
+    <div class="email-body">
+      <p>Salut Marc !</p>
+      <p>Merci pour ton courriel ! La plage, c'est génial !</p>
+      <p>Moi, je suis aussi au Nouveau-Brunswick, mais au Lac Baker. On est dans notre chalet dans la forêt. Ici, c'est très différent de la plage. C'est très calme et tranquille.</p>
+      <p>Le matin, on fait du canot sur le lac. L'eau du lac est très calme. L'après-midi, on fait des randonnées dans la forêt ou on fait un pique-nique près de l'eau. On voit beaucoup d'oiseaux et de petits animaux.</p>
+      <p>Le soir, on fait un feu de camp et on mange des guimauves. C'est très confortable et relaxant. J'adore la nature ici !</p>
+      <p>Bonnes vacances à Tracadie !</p>
+      <div class="email-sig">À bientôt,<br><strong>Sophie</strong></div>
+    </div>
+  </div>
+
+  <div class="vocab-box">
+    <div class="vocab-box-title">Mots importants</div>
+    <div class="vocab-grid">
+      <div class="vocab-item"><strong>les vacances</strong> — vacation</div>
+      <div class="vocab-item"><strong>le chalet</strong> — cottage</div>
+      <div class="vocab-item"><strong>la plage</strong> — beach</div>
+      <div class="vocab-item"><strong>l'océan</strong> — ocean</div>
+      <div class="vocab-item"><strong>la forêt</strong> — forest</div>
+      <div class="vocab-item"><strong>le lac</strong> — lake</div>
+      <div class="vocab-item"><strong>nager</strong> — to swim</div>
+      <div class="vocab-item"><strong>faire du canot</strong> — to canoe</div>
+      <div class="vocab-item"><strong>une randonnée</strong> — a hike</div>
+      <div class="vocab-item"><strong>un pique-nique</strong> — a picnic</div>
+      <div class="vocab-item"><strong>le feu de camp</strong> — campfire</div>
+      <div class="vocab-item"><strong>les fruits de mer</strong> — seafood</div>
+      <div class="vocab-item"><strong>les glaces</strong> — ice cream</div>
+      <div class="vocab-item"><strong>les guimauves</strong> — marshmallows</div>
+      <div class="vocab-item"><strong>le coucher de soleil</strong> — sunset</div>
+      <div class="vocab-item"><strong>calme</strong> — calm</div>
+      <div class="vocab-item"><strong>magnifique</strong> — beautiful</div>
+      <div class="vocab-item"><strong>délicieux</strong> — delicious</div>
+      <div class="vocab-item"><strong>agréable</strong> — pleasant</div>
+      <div class="vocab-item"><strong>relaxant</strong> — relaxing</div>
+    </div>
+  </div>
+
+  <div class="nom-line">
+    <span class="nom-label">Nom :</span>
+    <div class="nom-blank"></div>
+  </div>
+
+</div>
+</body>
+</html>
