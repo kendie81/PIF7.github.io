@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulaire — On va au cinéma ?</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F0E8;
+    --surface: #FFFDF7;
+    --accent: #E8622A;
+    --accent2: #0B84FE;
+    --text-primary: #1A1A1A;
+    --text-muted: #777;
+    --border: #E2DDD4;
+    --cat-1: #FFF0E8;
+    --cat-2: #E8F4FF;
+    --cat-3: #EDFBF0;
+    --cat-4: #F5EEFF;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+  .page-header {
+    max-width: 760px;
+    margin: 0 auto 2.5rem;
+  }
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: var(--text-primary);
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+  .subtitle { font-size: 15px; color: var(--text-muted); margin-bottom: 1.5rem; }
+  .nav-links { display: flex; gap: 12px; margin-bottom: 0.5rem; }
+  .nav-links a {
+    font-size: 13px; font-weight: 500; color: var(--text-primary);
+    text-decoration: none; padding: 6px 16px;
+    border: 1px solid var(--border); border-radius: 20px;
+    background: var(--surface); transition: all 0.2s;
+  }
+  .nav-links a:hover { border-color: var(--accent); color: var(--accent); }
+  .nav-links a.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+  .controls {
+    max-width: 760px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .search-wrap {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
+  .search-wrap input {
+    width: 100%;
+    padding: 9px 14px 9px 36px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-primary);
+    outline: none;
+  }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-icon {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); font-size: 16px; pointer-events: none;
+  }
+  .filter-btn {
+    padding: 8px 16px; border: 1px solid var(--border);
+    border-radius: 20px; background: var(--surface);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    color: var(--text-primary); font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover, .filter-btn.on { background: var(--accent); color: white; border-color: var(--accent); }
+  .flip-btn {
+    padding: 8px 16px; border: 1px solid var(--border);
+    border-radius: 20px; background: var(--surface);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    color: var(--accent); font-family: 'DM Sans', sans-serif;
+    border-color: var(--accent); transition: all 0.15s;
+  }
+  .flip-btn:hover { background: var(--accent); color: white; }
+
+  .grid {
+    max-width: 760px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    perspective: 600px;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.07); }
+  .card-inner {
+    transition: transform 0.4s;
+    transform-style: preserve-3d;
+    position: relative;
+    min-height: 90px;
+  }
+  .card.flipped .card-inner { transform: rotateY(180deg); }
+  .card-front, .card-back {
+    backface-visibility: hidden;
+    position: absolute; top: 0; left: 0; right: 0;
+  }
+  .card-front { position: relative; }
+  .card-back { transform: rotateY(180deg); }
+
+  .cat-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    display: inline-block; margin-right: 6px; vertical-align: middle;
+  }
+  .cat-label {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;
+    display: flex; align-items: center;
+  }
+  .french-word {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+  .word-type {
+    font-size: 11px; color: var(--text-muted);
+    font-style: italic; margin-bottom: 6px;
+  }
+  .hint-text {
+    font-size: 12px; color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .back-content {
+    padding-top: 0;
+  }
+  .english-word {
+    font-size: 1.1rem; font-weight: 500;
+    color: var(--accent2); margin-bottom: 6px;
+  }
+  .example {
+    font-size: 12px; color: var(--text-muted);
+    font-style: italic; line-height: 1.5;
+    border-left: 2px solid var(--border);
+    padding-left: 8px;
+  }
+  .flip-hint {
+    font-size: 10px; color: var(--text-muted);
+    position: absolute; bottom: 8px; right: 12px;
+    font-weight: 500; letter-spacing: 0.05em;
+  }
+
+  [data-cat="cinéma"] .cat-dot { background: #E8622A; }
+  [data-cat="temps"] .cat-dot { background: #0B84FE; }
+  [data-cat="argent"] .cat-dot { background: #34C759; }
+  [data-cat="verbes"] .cat-dot { background: #AF52DE; }
+  [data-cat="expressions"] .cat-dot { background: #FF9500; }
+
+  .section-bar {
+    max-width: 760px;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-bar span {
+    font-size: 13px; color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .section-bar hr { flex: 1; border: none; border-top: 1px solid var(--border); }
+
+  .phrase-section {
+    max-width: 760px;
+    margin: 2rem auto 0;
+  }
+  .phrase-section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .phrase-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .phrase-table th {
+    background: var(--bg);
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--text-muted); padding: 10px 16px;
+    text-align: left; border-bottom: 1px solid var(--border);
+  }
+  .phrase-table td {
+    padding: 12px 16px; font-size: 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .phrase-table tr:last-child td { border-bottom: none; }
+  .phrase-table td:first-child { font-weight: 500; color: var(--text-primary); width: 50%; }
+  .phrase-table td:last-child { color: #555; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="tag">Vocabulaire A1.2</div>
+  <h1>Mots clés</h1>
+  <p class="subtitle">Clique sur une carte pour voir la traduction en anglais</p>
+  <div class="nav-links">
+    <a href="reading.html">💬 Lecture</a>
+    <a href="vocabulaire.html" class="active">📖 Vocabulaire</a>
+    <a href="quiz.html">✏️ Quiz</a>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search" placeholder="Chercher un mot…" oninput="filterCards()">
+  </div>
+  <button class="filter-btn on" onclick="filterCat(this,'all')">Tout</button>
+  <button class="filter-btn" onclick="filterCat(this,'cinéma')">Cinéma</button>
+  <button class="filter-btn" onclick="filterCat(this,'temps')">Temps</button>
+  <button class="filter-btn" onclick="filterCat(this,'verbes')">Verbes</button>
+  <button class="filter-btn" onclick="filterCat(this,'expressions')">Expressions</button>
+  <button class="flip-btn" onclick="flipAll()">Tout retourner</button>
+</div>
+
+<div class="grid" id="grid">
+
+  <!-- CINÉMA -->
+  <div class="card" data-cat="cinéma" data-fr="le cinéma" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>cinéma</div>
+        <div class="french-word">le cinéma</div>
+        <div class="word-type">nom masculin</div>
+        <div class="hint-text">Un lieu où on regarde des films sur grand écran</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>cinéma</div>
+        <div class="english-word">the movie theatre</div>
+        <div class="example">« On va au cinéma ce soir. »<br>We're going to the cinema tonight.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-cat="cinéma" data-fr="le film" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>cinéma</div>
+        <div class="french-word">le film</div>
+        <div class="word-type">nom masculin</div>
+        <div class="hint-text">Une histoire sur grand écran</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>cinéma</div>
+        <div class="english-word">the film / movie</div>
+        <div class="example">« Quel film tu veux voir ? »<br>Which movie do you want to see?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-cat="cinéma" data-fr="la séance" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>cinéma</div>
+        <div class="french-word">la séance</div>
+        <div class="word-type">nom féminin</div>
+        <div class="hint-text">L'heure où un film est projeté</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>cinéma</div>
+        <div class="english-word">the showing / screening</div>
+        <div class="example">« Il y a une séance à 19h00. »<br>There's a showing at 7 PM.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-cat="cinéma" data-fr="le billet" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>cinéma</div>
+        <div class="french-word">le billet</div>
+        <div class="word-type">nom masculin</div>
+        <div class="hint-text">Un ticket pour entrer au cinéma</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>cinéma</div>
+        <div class="english-word">the ticket</div>
+        <div class="example">« Je vais acheter mon billet en ligne. »<br>I'm going to buy my ticket online.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-cat="cinéma" data-fr="la carte étudiante" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>cinéma</div>
+        <div class="french-word">la carte étudiante</div>
+        <div class="word-type">nom féminin</div>
+        <div class="hint-text">Une carte qui donne des réductions aux élèves</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>cinéma</div>
+        <div class="english-word">student card / ID</div>
+        <div class="example">« Avec la carte étudiante, c'est neuf euros. »<br>With the student card, it's nine euros.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-cat="cinéma" data-fr="un film d'action" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>cinéma</div>
+        <div class="french-word">un film d'action</div>
+        <div class="word-type">nom masculin</div>
+        <div class="hint-text">Un type de film avec beaucoup d'aventure</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>cinéma</div>
+        <div class="english-word">an action movie</div>
+        <div class="example">« C'est un film d'action avec beaucoup d'aventure. »<br>It's an action movie with lots of adventure.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEMPS -->
+  <div class="card" data-cat="temps" data-fr="ce soir" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>temps</div>
+        <div class="french-word">ce soir</div>
+        <div class="word-type">expression de temps</div>
+        <div class="hint-text">La soirée du jour même</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>temps</div>
+        <div class="english-word">tonight / this evening</div>
+        <div class="example">« Tu es libre ce soir ? »<br>Are you free tonight?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-cat="temps" data-fr="à quelle heure" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>temps</div>
+        <div class="french-word">à quelle heure ?</div>
+        <div class="word-type">question</div>
+        <div class="hint-text">Pour demander l'heure d'un événement</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>temps</div>
+        <div class="english-word">at what time? / when?</div>
+        <div class="example">« À quelle heure commence le film ? »<br>What time does the movie start?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-cat="temps" data-fr="maintenant" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>temps</div>
+        <div class="french-word">maintenant</div>
+        <div class="word-type">adverbe</div>
+        <div class="hint-text">À ce moment précis</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>temps</div>
+        <div class="english-word">now</div>
+        <div class="example">« On doit acheter les billets maintenant. »<br>We need to buy the tickets now.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-cat="temps" data-fr="après" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>temps</div>
+        <div class="french-word">après</div>
+        <div class="word-type">adverbe / préposition</div>
+        <div class="hint-text">Plus tard, dans un moment suivant</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>temps</div>
+        <div class="english-word">after / afterwards</div>
+        <div class="example">« Après le film, on peut manger. »<br>After the movie, we can eat.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARGENT -->
+  <div class="card" data-cat="argent" data-fr="combien coûte" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>argent</div>
+        <div class="french-word">combien coûte… ?</div>
+        <div class="word-type">question</div>
+        <div class="hint-text">Pour demander le prix de quelque chose</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>argent</div>
+        <div class="english-word">how much does… cost?</div>
+        <div class="example">« Combien coûte un billet ? »<br>How much does a ticket cost?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-cat="argent" data-fr="en ligne" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>argent</div>
+        <div class="french-word">en ligne</div>
+        <div class="word-type">expression</div>
+        <div class="hint-text">Sur Internet</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>argent</div>
+        <div class="english-word">online</div>
+        <div class="example">« On peut acheter les billets en ligne. »<br>We can buy the tickets online.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VERBES -->
+  <div class="card" data-cat="verbes" data-fr="vouloir" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>verbes</div>
+        <div class="french-word">vouloir</div>
+        <div class="word-type">verbe — tu veux / je veux</div>
+        <div class="hint-text">Avoir le désir de faire quelque chose</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>verbes</div>
+        <div class="english-word">to want</div>
+        <div class="example">« Tu veux venir avec moi ? »<br>Do you want to come with me?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-cat="verbes" data-fr="commencer" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>verbes</div>
+        <div class="french-word">commencer</div>
+        <div class="word-type">verbe — il commence</div>
+        <div class="hint-text">Débuter, avoir un début</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>verbes</div>
+        <div class="english-word">to start / to begin</div>
+        <div class="example">« À quelle heure commence le film ? »<br>What time does the film start?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-cat="verbes" data-fr="acheter" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>verbes</div>
+        <div class="french-word">acheter</div>
+        <div class="word-type">verbe — j'achète / on achète</div>
+        <div class="hint-text">Payer pour avoir quelque chose</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>verbes</div>
+        <div class="english-word">to buy</div>
+        <div class="example">« Je vais acheter mon billet maintenant. »<br>I'm going to buy my ticket now.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-cat="verbes" data-fr="préférer" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>verbes</div>
+        <div class="french-word">préférer</div>
+        <div class="word-type">verbe — tu préfères</div>
+        <div class="hint-text">Aimer mieux une chose qu'une autre</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>verbes</div>
+        <div class="english-word">to prefer</div>
+        <div class="example">« Tu préfères quelle heure ? »<br>Which time do you prefer?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPRESSIONS -->
+  <div class="card" data-cat="expressions" data-fr="on se retrouve" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>expressions</div>
+        <div class="french-word">on se retrouve</div>
+        <div class="word-type">expression</div>
+        <div class="hint-text">Pour dire où et quand on va se voir</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>expressions</div>
+        <div class="english-word">we'll meet up / let's meet</div>
+        <div class="example">« On se retrouve devant le cinéma à 18h45. »<br>Let's meet in front of the cinema at 6:45.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-cat="expressions" data-fr="bonne idée" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>expressions</div>
+        <div class="french-word">bonne idée !</div>
+        <div class="word-type">expression</div>
+        <div class="hint-text">Pour dire qu'on aime une suggestion</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>expressions</div>
+        <div class="english-word">good idea!</div>
+        <div class="example">« Bonne idée ! On peut manger une pizza. »<br>Good idea! We can eat a pizza.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-cat="expressions" data-fr="à côté de" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>expressions</div>
+        <div class="french-word">à côté de</div>
+        <div class="word-type">préposition</div>
+        <div class="hint-text">Très proche de quelque chose</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>expressions</div>
+        <div class="english-word">next to / beside</div>
+        <div class="example">« Il y a une pizzeria à côté du cinéma. »<br>There's a pizzeria next to the cinema.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-cat="expressions" data-fr="beaucoup de monde" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>expressions</div>
+        <div class="french-word">beaucoup de monde</div>
+        <div class="word-type">expression</div>
+        <div class="hint-text">Un grand nombre de personnes</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>expressions</div>
+        <div class="english-word">a lot of people / a crowd</div>
+        <div class="example">« Il y a beaucoup de monde le vendredi soir. »<br>There are a lot of people on Friday nights.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-cat="expressions" data-fr="à pied" onclick="flipCard(this)">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="cat-label"><span class="cat-dot"></span>expressions</div>
+        <div class="french-word">à pied</div>
+        <div class="word-type">expression</div>
+        <div class="hint-text">Sans voiture, en marchant</div>
+        <span class="flip-hint">CLIQUER ↺</span>
+      </div>
+      <div class="card-back back-content">
+        <div class="cat-label"><span class="cat-dot"></span>expressions</div>
+        <div class="english-word">on foot / walking</div>
+        <div class="example">« C'est à dix minutes à pied. »<br>It's a ten-minute walk.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- KEY PHRASES -->
+<div class="phrase-section">
+  <h2>Expressions utiles du dialogue</h2>
+  <table class="phrase-table">
+    <thead>
+      <tr><th>Français</th><th>English</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Tu es libre ce soir ?</td><td>Are you free tonight?</td></tr>
+      <tr><td>Tu veux venir avec moi ?</td><td>Do you want to come with me?</td></tr>
+      <tr><td>Quel film ?</td><td>Which movie?</td></tr>
+      <tr><td>Il s'appelle…</td><td>It's called… / Its name is…</td></tr>
+      <tr><td>À quelle heure commence le film ?</td><td>What time does the film start?</td></tr>
+      <tr><td>On se retrouve devant le cinéma.</td><td>Let's meet in front of the cinema.</td></tr>
+      <tr><td>Est-ce qu'on doit acheter les billets ?</td><td>Do we need to buy the tickets?</td></tr>
+      <tr><td>Combien coûte un billet ?</td><td>How much does a ticket cost?</td></tr>
+      <tr><td>On peut manger une pizza.</td><td>We can eat a pizza.</td></tr>
+      <tr><td>À ce soir !</td><td>See you tonight!</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+let allFlipped = false;
+function flipCard(card) {
+  card.classList.toggle('flipped');
+}
+function flipAll() {
+  allFlipped = !allFlipped;
+  document.querySelectorAll('.card').forEach(c => {
+    if(allFlipped) c.classList.add('flipped');
+    else c.classList.remove('flipped');
+  });
+}
+function filterCat(btn, cat) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.card').forEach(c => {
+    if(cat === 'all' || c.dataset.cat === cat) c.style.display = '';
+    else c.style.display = 'none';
+  });
+}
+function filterCards() {
+  const val = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('.card').forEach(c => {
+    const fr = c.dataset.fr || '';
+    c.style.display = fr.includes(val) ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>

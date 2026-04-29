@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Cinéma — Lecture A1.2</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F0E8;
+    --surface: #FFFDF7;
+    --phone-bg: #1C1C1E;
+    --emma-bubble: #FFFFFF;
+    --leo-bubble: #0B84FE;
+    --text-primary: #1A1A1A;
+    --text-muted: #888;
+    --accent: #E8622A;
+    --border: #E2DDD4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+  .page-header {
+    max-width: 680px;
+    margin: 0 auto 2.5rem;
+  }
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    color: var(--text-primary);
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+  .subtitle {
+    font-size: 15px;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+  .nav-links {
+    display: flex;
+    gap: 12px;
+  }
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-decoration: none;
+    padding: 6px 16px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    transition: all 0.2s;
+  }
+  .nav-links a:hover { border-color: var(--accent); color: var(--accent); }
+
+  .phone-wrap {
+    max-width: 420px;
+    margin: 0 auto;
+  }
+  .phone {
+    background: var(--phone-bg);
+    border-radius: 44px;
+    padding: 16px 12px 28px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.28), 0 0 0 1px rgba(255,255,255,0.06);
+    position: relative;
+  }
+  .phone-notch {
+    width: 120px;
+    height: 28px;
+    background: var(--phone-bg);
+    border-radius: 0 0 20px 20px;
+    margin: 0 auto 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .notch-cam { width: 10px; height: 10px; background: #2A2A2C; border-radius: 50%; }
+  .notch-speaker { width: 60px; height: 4px; background: #2A2A2C; border-radius: 4px; }
+
+  .phone-screen {
+    background: #F2F2F7;
+    border-radius: 32px;
+    overflow: hidden;
+  }
+  .phone-header {
+    background: rgba(242,242,247,0.92);
+    backdrop-filter: blur(12px);
+    padding: 10px 16px 12px;
+    text-align: center;
+    border-bottom: 0.5px solid rgba(0,0,0,0.08);
+  }
+  .contact-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+    margin: 0 auto 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 500;
+    color: white;
+  }
+  .contact-name { font-size: 13px; font-weight: 500; color: #1C1C1E; }
+  .contact-status { font-size: 11px; color: #8E8E93; }
+
+  .messages {
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    max-height: 540px;
+    overflow-y: auto;
+    background: #F2F2F7;
+  }
+  .msg-group { margin-bottom: 8px; }
+  .time-label {
+    text-align: center;
+    font-size: 11px;
+    color: #8E8E93;
+    margin: 10px 0 6px;
+    font-weight: 500;
+  }
+  .bubble {
+    max-width: 75%;
+    padding: 8px 12px;
+    border-radius: 18px;
+    font-size: 15px;
+    line-height: 1.4;
+    position: relative;
+    animation: fadeUp 0.3s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .bubble.emma {
+    background: var(--emma-bubble);
+    color: #1C1C1E;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  }
+  .bubble.leo {
+    background: var(--leo-bubble);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+  .bubble-row {
+    display: flex;
+    flex-direction: column;
+  }
+  .bubble-row.emma { align-items: flex-start; }
+  .bubble-row.leo { align-items: flex-end; }
+
+  .sender-name {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+    padding: 0 4px;
+  }
+
+  .annotation {
+    max-width: 680px;
+    margin: 2rem auto 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+  }
+  .annotation h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+  }
+  .annotation p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #555;
+  }
+  .annotation p + p { margin-top: 0.5rem; }
+
+  .about-row {
+    max-width: 680px;
+    margin: 1.5rem auto 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .about-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+  }
+  .about-card .label { font-size: 11px; color: var(--accent); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+  .about-card .val { font-size: 14px; color: var(--text-primary); }
+
+  .bubble { animation-fill-mode: both; }
+  .bubble:nth-child(1) { animation-delay: 0.1s; }
+  .bubble:nth-child(2) { animation-delay: 0.2s; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="tag">Lecture A1.2</div>
+  <h1>On va au cinéma ?</h1>
+  <p class="subtitle">Emma et Léo planifient une sortie — ~400 mots · niveau débutant</p>
+  <div class="nav-links">
+    <a href="vocabulaire.html">📖 Vocabulaire</a>
+    <a href="quiz.html">✏️ Quiz</a>
+  </div>
+</div>
+
+<div class="phone-wrap">
+  <div class="phone">
+    <div class="phone-notch">
+      <div class="notch-cam"></div>
+      <div class="notch-speaker"></div>
+    </div>
+    <div class="phone-screen">
+      <div class="phone-header">
+        <div class="contact-avatar">E</div>
+        <div class="contact-name">Emma 🎬</div>
+        <div class="contact-status">iMessage</div>
+      </div>
+
+      <div class="messages">
+
+        <div class="time-label">Vendredi 16h12</div>
+
+        <div class="bubble-row emma">
+          <div class="bubble emma">Salut Léo ! Tu es libre ce soir ?</div>
+        </div>
+        <div class="bubble-row leo">
+          <div class="bubble leo">Oui ! Pourquoi ?</div>
+        </div>
+        <div class="bubble-row emma">
+          <div class="bubble emma">Je veux aller au cinéma. Tu veux venir avec moi ?</div>
+        </div>
+        <div class="bubble-row leo">
+          <div class="bubble leo">Bonne idée ! Quel film ?</div>
+        </div>
+        <div class="bubble-row emma">
+          <div class="bubble emma">Il y a un nouveau film d'action. Il s'appelle « Le Dernier Voyage ». Tu connais ?</div>
+        </div>
+        <div class="bubble-row leo">
+          <div class="bubble leo">Non, je ne connais pas. C'est bien ?</div>
+        </div>
+        <div class="bubble-row emma">
+          <div class="bubble emma">Je pense que oui ! Ma sœur dit que c'est super. Il y a beaucoup d'aventure.</div>
+        </div>
+
+        <div class="time-label">16h18</div>
+
+        <div class="bubble-row leo">
+          <div class="bubble leo">D'accord ! À quelle heure commence le film ?</div>
+        </div>
+        <div class="bubble-row emma">
+          <div class="bubble emma">Il y a une séance à 19h00 et une autre à 21h00. Tu préfères quelle heure ?</div>
+        </div>
+        <div class="bubble-row leo">
+          <div class="bubble leo">19h00, c'est parfait. Ce n'est pas trop tard.</div>
+        </div>
+        <div class="bubble-row emma">
+          <div class="bubble emma">Super ! On se retrouve devant le cinéma à 18h45 ?</div>
+        </div>
+        <div class="bubble-row leo">
+          <div class="bubble leo">Oui, d'accord. Quel cinéma ?</div>
+        </div>
+        <div class="bubble-row emma">
+          <div class="bubble emma">Le Cinéma Rex, rue Saint-Jean. Tu connais ?</div>
+        </div>
+        <div class="bubble-row leo">
+          <div class="bubble leo">Oui, je connais ! C'est près du parc, non ?</div>
+        </div>
+        <div class="bubble-row emma">
+          <div class="bubble emma">Exactement ! C'est à dix minutes à pied de chez moi.</div>
+        </div>
+
+        <div class="time-label">16h25</div>
+
+        <div class="bubble-row leo">
+          <div class="bubble leo">Est-ce qu'on doit acheter les billets maintenant ?</div>
+        </div>
+        <div class="bubble-row emma">
+          <div class="bubble emma">Oui, je pense. Il y a beaucoup de monde le vendredi soir. On peut acheter en ligne.</div>
+        </div>
+        <div class="bubble-row leo">
+          <div class="bubble leo">Combien coûte un billet ?</div>
+        </div>
+        <div class="bubble-row emma">
+          <div class="bubble emma">C'est douze euros pour les adultes, mais neuf euros avec la carte étudiante !</div>
+        </div>
+        <div class="bubble-row leo">
+          <div class="bubble leo">Ah, super ! J'ai ma carte étudiante. Je vais acheter mon billet maintenant.</div>
+        </div>
+        <div class="bubble-row emma">
+          <div class="bubble emma">Moi aussi. Et après le film, on peut manger une pizza ? J'ai très faim le soir !</div>
+        </div>
+
+        <div class="time-label">16h31</div>
+
+        <div class="bubble-row leo">
+          <div class="bubble leo">Oui, bonne idée ! Il y a une bonne pizzeria à côté du cinéma.</div>
+        </div>
+        <div class="bubble-row emma">
+          <div class="bubble emma">Parfait ! Alors, à ce soir à 18h45 !</div>
+        </div>
+        <div class="bubble-row leo">
+          <div class="bubble leo">À ce soir ! 🎬🍕</div>
+        </div>
+        <div class="bubble-row emma">
+          <div class="bubble emma">😄👍</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="about-row">
+  <div class="about-card">
+    <div class="label">Personnages</div>
+    <div class="val">Emma &amp; Léo — deux amis, lycéens</div>
+  </div>
+  <div class="about-card">
+    <div class="label">Thème</div>
+    <div class="val">Planifier une sortie au cinéma</div>
+  </div>
+  <div class="about-card">
+    <div class="label">Structures clés</div>
+    <div class="val">Tu veux… ? On peut… À quelle heure… ?</div>
+  </div>
+  <div class="about-card">
+    <div class="label">Niveau</div>
+    <div class="val">CECR A1.2 — débutant</div>
+  </div>
+</div>
+
+<div class="annotation">
+  <h3>Note pour l'enseignant·e</h3>
+  <p>Ce dialogue présente le vocabulaire des sorties (cinéma, billets, séance, prix) et les structures de base pour faire des projets : <em>Tu veux venir ?</em>, <em>On se retrouve où ?</em>, <em>À quelle heure ?</em>, <em>Combien coûte… ?</em></p>
+  <p>Les élèves peuvent utiliser le <a href="vocabulaire.html" style="color:var(--accent)">vocabulaire</a> pendant la lecture, puis compléter le <a href="quiz.html" style="color:var(--accent)">quiz de compréhension</a> pour vérifier leur compréhension.</p>
+</div>
+
+</body>
+</html>

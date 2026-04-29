@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — On va au cinéma ?</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F0E8;
+    --surface: #FFFDF7;
+    --accent: #E8622A;
+    --accent2: #0B84FE;
+    --text-primary: #1A1A1A;
+    --text-muted: #777;
+    --border: #E2DDD4;
+    --green: #3B6D11;
+    --green-bg: #EAF3DE;
+    --red: #A32D2D;
+    --red-bg: #FCEBEB;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+  .page-header {
+    max-width: 680px;
+    margin: 0 auto 2.5rem;
+  }
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: var(--text-primary);
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+  .subtitle { font-size: 15px; color: var(--text-muted); margin-bottom: 1.5rem; }
+  .nav-links { display: flex; gap: 12px; }
+  .nav-links a {
+    font-size: 13px; font-weight: 500; color: var(--text-primary);
+    text-decoration: none; padding: 6px 16px;
+    border: 1px solid var(--border); border-radius: 20px;
+    background: var(--surface); transition: all 0.2s;
+  }
+  .nav-links a:hover { border-color: var(--accent); color: var(--accent); }
+  .nav-links a.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+  .progress-wrap {
+    max-width: 680px;
+    margin: 0 auto 2rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-bar {
+    flex: 1; height: 4px;
+    background: var(--border); border-radius: 4px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--accent);
+    border-radius: 4px; transition: width 0.4s ease;
+  }
+  .progress-label { font-size: 13px; color: var(--text-muted); white-space: nowrap; }
+
+  .quiz-container { max-width: 680px; margin: 0 auto; }
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1.75rem;
+    margin-bottom: 16px;
+    transition: opacity 0.2s;
+  }
+  .q-number {
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .q-type-badge {
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    padding: 1px 8px; border-radius: 10px;
+  }
+  .q-text {
+    font-size: 16px; font-weight: 400;
+    color: var(--text-primary); line-height: 1.6;
+    margin-bottom: 1.25rem;
+  }
+  .q-text em { font-style: italic; color: var(--text-muted); font-size: 14px; }
+
+  .opts { display: flex; flex-direction: column; gap: 8px; }
+  .opt-btn {
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    text-align: left;
+    color: var(--text-primary);
+    transition: all 0.15s;
+    line-height: 1.4;
+  }
+  .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: #FFF5F0; }
+  .opt-btn.correct { background: var(--green-bg); border-color: var(--green); color: var(--green); font-weight: 500; }
+  .opt-btn.wrong { background: var(--red-bg); border-color: var(--red); color: var(--red); }
+  .opt-btn:disabled { cursor: default; }
+
+  .fill-row { display: flex; gap: 8px; align-items: center; }
+  input.fill {
+    flex: 1; padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    color: var(--text-primary); outline: none;
+  }
+  input.fill:focus { border-color: var(--accent); }
+  input.fill.correct { border-color: var(--green); background: var(--green-bg); color: var(--green); font-weight: 500; }
+  input.fill.wrong { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+  .check-btn {
+    padding: 10px 18px;
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    background: var(--accent);
+    color: white; font-size: 13px;
+    font-weight: 500; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; white-space: nowrap; transition: all 0.15s;
+  }
+  .check-btn:hover { opacity: 0.88; }
+  .check-btn:disabled { opacity: 0.4; cursor: default; }
+
+  .vf-row { display: flex; gap: 10px; }
+  .vf-btn {
+    flex: 1; padding: 12px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--bg); font-size: 15px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif; cursor: pointer;
+    transition: all 0.15s; color: var(--text-primary);
+  }
+  .vf-btn:hover:not(:disabled) { border-color: var(--accent); }
+  .vf-btn.correct { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+  .vf-btn.wrong { background: var(--red-bg); border-color: var(--red); color: var(--red); }
+  .vf-btn:disabled { cursor: default; }
+
+  .feedback {
+    margin-top: 12px; font-size: 13px;
+    padding: 8px 12px; border-radius: 8px;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: var(--green-bg); color: var(--green); }
+  .feedback.bad { background: var(--red-bg); color: var(--red); }
+
+  .results-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 2.5rem;
+    text-align: center;
+    display: none;
+  }
+  .results-card.show { display: block; }
+  .results-score {
+    font-family: 'DM Serif Display', serif;
+    font-size: 4rem; line-height: 1;
+    color: var(--accent); margin-bottom: 0.5rem;
+  }
+  .results-label { font-size: 16px; color: var(--text-muted); margin-bottom: 1.5rem; }
+  .results-msg { font-size: 15px; color: var(--text-primary); margin-bottom: 2rem; line-height: 1.6; }
+  .retry-btn {
+    padding: 12px 32px;
+    border: none; border-radius: 12px;
+    background: var(--accent); color: white;
+    font-size: 15px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: opacity 0.15s;
+    margin: 0 6px;
+  }
+  .retry-btn:hover { opacity: 0.88; }
+  .retry-btn.outline {
+    background: transparent; border: 1px solid var(--border); color: var(--text-primary);
+  }
+
+  .stat-row { display: flex; gap: 12px; justify-content: center; margin-bottom: 1.5rem; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 1.5rem; font-weight: 500; color: var(--text-primary); }
+  .stat-lbl { font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="tag">Quiz A1.2</div>
+  <h1>Quiz de compréhension</h1>
+  <p class="subtitle">10 questions sur le dialogue « On va au cinéma ? »</p>
+  <div class="nav-links">
+    <a href="reading.html">💬 Lecture</a>
+    <a href="vocabulaire.html">📖 Vocabulaire</a>
+    <a href="quiz.html" class="active">✏️ Quiz</a>
+  </div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="pbar" style="width:0%"></div></div>
+  <div class="progress-label" id="plabel">0 / 10</div>
+</div>
+
+<div class="quiz-container" id="quiz">
+
+  <!-- Q1 -->
+  <div class="q-card" id="q1card">
+    <div class="q-number">Question 1 <span class="q-type-badge">Choix multiple</span></div>
+    <div class="q-text">Pourquoi est-ce qu'Emma envoie un message à Léo ?</div>
+    <div class="opts">
+      <button class="opt-btn" onclick="mcq(this,'q1',false)">Elle veut faire les devoirs avec lui.</button>
+      <button class="opt-btn" onclick="mcq(this,'q1',true)">Elle veut aller au cinéma avec lui.</button>
+      <button class="opt-btn" onclick="mcq(this,'q1',false)">Elle veut manger une pizza.</button>
+      <button class="opt-btn" onclick="mcq(this,'q1',false)">Elle cherche une pizzeria.</button>
+    </div>
+    <div class="feedback" id="q1fb"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card" id="q2card">
+    <div class="q-number">Question 2 <span class="q-type-badge">Vrai ou faux</span></div>
+    <div class="q-text">Le film s'appelle « Le Dernier Voyage » et c'est un film d'horreur.</div>
+    <div class="vf-row">
+      <button class="vf-btn" onclick="vf(this,'q2',false)">✓ Vrai</button>
+      <button class="vf-btn" onclick="vf(this,'q2',true)">✗ Faux</button>
+    </div>
+    <div class="feedback" id="q2fb"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card" id="q3card">
+    <div class="q-number">Question 3 <span class="q-type-badge">Choix multiple</span></div>
+    <div class="q-text">Ils choisissent quelle séance ?</div>
+    <div class="opts">
+      <button class="opt-btn" onclick="mcq(this,'q3',false)">La séance à 21h00</button>
+      <button class="opt-btn" onclick="mcq(this,'q3',true)">La séance à 19h00</button>
+      <button class="opt-btn" onclick="mcq(this,'q3',false)">La séance à 20h00</button>
+      <button class="opt-btn" onclick="mcq(this,'q3',false)">La séance à 18h00</button>
+    </div>
+    <div class="feedback" id="q3fb"></div>
+  </div>
+
+  <!-- Q4 fill -->
+  <div class="q-card" id="q4card">
+    <div class="q-number">Question 4 <span class="q-type-badge">Complète</span></div>
+    <div class="q-text">Ils se retrouvent devant le cinéma à <em>quelle heure</em> ?<br><em>(Écris l'heure en chiffres, ex: 18h00)</em></div>
+    <div class="fill-row">
+      <input class="fill" id="q4in" placeholder="___h__" autocomplete="off" onkeydown="if(event.key==='Enter')checkFill('q4',['18h45','18:45','6h45','18 h 45'])">
+      <button class="check-btn" id="q4btn" onclick="checkFill('q4',['18h45','18:45','6h45','18 h 45'])">Vérifier</button>
+    </div>
+    <div class="feedback" id="q4fb"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card" id="q5card">
+    <div class="q-number">Question 5 <span class="q-type-badge">Choix multiple</span></div>
+    <div class="q-text">Comment s'appelle le cinéma ?</div>
+    <div class="opts">
+      <button class="opt-btn" onclick="mcq(this,'q5',false)">Le Cinéma Lumière, rue Saint-Jean</button>
+      <button class="opt-btn" onclick="mcq(this,'q5',false)">Le Cinéma Palace, près du parc</button>
+      <button class="opt-btn" onclick="mcq(this,'q5',true)">Le Cinéma Rex, rue Saint-Jean</button>
+      <button class="opt-btn" onclick="mcq(this,'q5',false)">Le Cinéma Rex, rue Saint-Pierre</button>
+    </div>
+    <div class="feedback" id="q5fb"></div>
+  </div>
+
+  <!-- Q6 VF -->
+  <div class="q-card" id="q6card">
+    <div class="q-number">Question 6 <span class="q-type-badge">Vrai ou faux</span></div>
+    <div class="q-text">Léo connaît le Cinéma Rex — il dit que c'est près du parc.</div>
+    <div class="vf-row">
+      <button class="vf-btn" onclick="vf(this,'q6',true)">✓ Vrai</button>
+      <button class="vf-btn" onclick="vf(this,'q6',false)">✗ Faux</button>
+    </div>
+    <div class="feedback" id="q6fb"></div>
+  </div>
+
+  <!-- Q7 MCQ -->
+  <div class="q-card" id="q7card">
+    <div class="q-number">Question 7 <span class="q-type-badge">Choix multiple</span></div>
+    <div class="q-text">Combien coûte un billet avec la carte étudiante ?</div>
+    <div class="opts">
+      <button class="opt-btn" onclick="mcq(this,'q7',false)">Douze euros</button>
+      <button class="opt-btn" onclick="mcq(this,'q7',false)">Dix euros</button>
+      <button class="opt-btn" onclick="mcq(this,'q7',true)">Neuf euros</button>
+      <button class="opt-btn" onclick="mcq(this,'q7',false)">Sept euros</button>
+    </div>
+    <div class="feedback" id="q7fb"></div>
+  </div>
+
+  <!-- Q8 fill -->
+  <div class="q-card" id="q8card">
+    <div class="q-number">Question 8 <span class="q-type-badge">Complète</span></div>
+    <div class="q-text">Pourquoi est-ce qu'ils doivent acheter les billets <em>maintenant</em> ? Complète :<br>« Il y a beaucoup de monde le ___________ soir. »</div>
+    <div class="fill-row">
+      <input class="fill" id="q8in" placeholder="quel jour ?" autocomplete="off" onkeydown="if(event.key==='Enter')checkFill('q8',['vendredi'])">
+      <button class="check-btn" id="q8btn" onclick="checkFill('q8',['vendredi'])">Vérifier</button>
+    </div>
+    <div class="feedback" id="q8fb"></div>
+  </div>
+
+  <!-- Q9 VF -->
+  <div class="q-card" id="q9card">
+    <div class="q-number">Question 9 <span class="q-type-badge">Vrai ou faux</span></div>
+    <div class="q-text">Après le film, Emma et Léo vont manger un hamburger.</div>
+    <div class="vf-row">
+      <button class="vf-btn" onclick="vf(this,'q9',false)">✓ Vrai</button>
+      <button class="vf-btn" onclick="vf(this,'q9',true)">✗ Faux</button>
+    </div>
+    <div class="feedback" id="q9fb"></div>
+  </div>
+
+  <!-- Q10 MCQ -->
+  <div class="q-card" id="q10card">
+    <div class="q-number">Question 10 <span class="q-type-badge">Choix multiple</span></div>
+    <div class="q-text">Qui a dit que le film est « super » ?</div>
+    <div class="opts">
+      <button class="opt-btn" onclick="mcq(this,'q10',false)">Le frère d'Emma</button>
+      <button class="opt-btn" onclick="mcq(this,'q10',false)">Le frère de Léo</button>
+      <button class="opt-btn" onclick="mcq(this,'q10',true)">La sœur d'Emma</button>
+      <button class="opt-btn" onclick="mcq(this,'q10',false)">La sœur de Léo</button>
+    </div>
+    <div class="feedback" id="q10fb"></div>
+  </div>
+
+  <!-- Results -->
+  <div class="results-card" id="results">
+    <div class="results-score" id="rscore">—</div>
+    <div class="results-label">sur 10</div>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-num" id="rcorrect">—</div><div class="stat-lbl">Correct</div></div>
+      <div class="stat"><div class="stat-num" id="rwrong">—</div><div class="stat-lbl">Incorrect</div></div>
+      <div class="stat"><div class="stat-num" id="rpct">—</div><div class="stat-lbl">Score</div></div>
+    </div>
+    <div class="results-msg" id="rmsg"></div>
+    <button class="retry-btn outline" onclick="window.location.href='reading.html'">Relire le dialogue</button>
+    <button class="retry-btn" onclick="resetQuiz()">Recommencer le quiz</button>
+  </div>
+
+</div>
+
+<script>
+const total = 10;
+let answered = 0;
+let score = 0;
+const done = {};
+
+const feedbacks = {
+  q1: { ok: 'Exact ! Emma veut aller au cinéma avec Léo.', bad: 'Pas tout à fait. Emma veut aller au cinéma — pas faire les devoirs !' },
+  q2: { ok: 'Bien vu ! C\'est faux — c\'est un film d\'action, pas d\'horreur.', bad: 'Relis le dialogue. Le film s\'appelle « Le Dernier Voyage » — c\'est un film d\'action.' },
+  q3: { ok: 'Parfait ! Léo dit : « 19h00, c\'est parfait. »', bad: 'Non. Léo préfère 19h00 parce que ce n\'est pas trop tard.' },
+  q4: { ok: 'Très bien ! Ils se retrouvent à 18h45 devant le cinéma.', bad: 'La réponse est 18h45. Emma dit : « On se retrouve devant le cinéma à 18h45 ? »' },
+  q5: { ok: 'Exact ! Le Cinéma Rex, rue Saint-Jean.', bad: 'Attention ! C\'est Le Cinéma Rex, rue Saint-Jean.' },
+  q6: { ok: 'Oui, c\'est vrai ! Léo dit : « C\'est près du parc, non ? »', bad: 'Relis ! Léo dit bien que c\'est près du parc.' },
+  q7: { ok: 'Bravo ! Avec la carte étudiante, c\'est neuf euros.', bad: 'Non. Le plein tarif est douze euros, mais avec la carte étudiante c\'est neuf euros.' },
+  q8: { ok: 'Correct ! Le vendredi soir, il y a beaucoup de monde.', bad: 'La réponse est « vendredi ». Il y a beaucoup de monde le vendredi soir.' },
+  q9: { ok: 'Vrai — c\'est faux ! Ils veulent manger une pizza, pas un hamburger.', bad: 'Relis ! Emma propose de manger une pizza, pas un hamburger.' },
+  q10: { ok: 'Oui ! Emma dit : « Ma sœur dit que c\'est super. »', bad: 'Non. C\'est la sœur d\'Emma qui dit que le film est super.' },
+};
+
+function updateProgress() {
+  const pct = Math.round((answered / total) * 100);
+  document.getElementById('pbar').style.width = pct + '%';
+  document.getElementById('plabel').textContent = answered + ' / ' + total;
+  if(answered === total) setTimeout(showResults, 600);
+}
+
+function showFeedback(qid, correct) {
+  const fb = document.getElementById(qid + 'fb');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'bad');
+  fb.textContent = correct ? feedbacks[qid].ok : feedbacks[qid].bad;
+}
+
+function mcq(btn, qid, isCorrect) {
+  if(done[qid]) return;
+  done[qid] = true;
+  const allBtns = btn.closest('.opts').querySelectorAll('.opt-btn');
+  allBtns.forEach(b => b.disabled = true);
+  if(isCorrect) {
+    btn.classList.add('correct');
+    score++;
+  } else {
+    btn.classList.add('wrong');
+    allBtns.forEach(b => { if(b.onclick.toString().includes('true')) b.classList.add('correct'); });
+  }
+  showFeedback(qid, isCorrect);
+  answered++;
+  updateProgress();
+}
+
+function vf(btn, qid, isCorrect) {
+  if(done[qid]) return;
+  done[qid] = true;
+  const row = btn.closest('.vf-row');
+  row.querySelectorAll('.vf-btn').forEach(b => b.disabled = true);
+  if(isCorrect) { btn.classList.add('correct'); score++; }
+  else { btn.classList.add('wrong'); }
+  showFeedback(qid, isCorrect);
+  answered++;
+  updateProgress();
+}
+
+function checkFill(qid, accepted) {
+  if(done[qid]) return;
+  const inp = document.getElementById(qid + 'in');
+  const btn = document.getElementById(qid + 'btn');
+  const val = inp.value.trim().toLowerCase().replace(/\s+/g,'');
+  const normalised = accepted.map(a => a.toLowerCase().replace(/\s+/g,''));
+  const correct = normalised.includes(val);
+  done[qid] = true;
+  inp.disabled = true;
+  btn.disabled = true;
+  inp.classList.add(correct ? 'correct' : 'wrong');
+  showFeedback(qid, correct);
+  if(correct) score++;
+  answered++;
+  updateProgress();
+}
+
+function showResults() {
+  document.getElementById('results').classList.add('show');
+  document.getElementById('rscore').textContent = score;
+  document.getElementById('rcorrect').textContent = score;
+  document.getElementById('rwrong').textContent = total - score;
+  document.getElementById('rpct').textContent = Math.round((score/total)*100) + '%';
+  const msgs = [
+    [10, 'Excellent ! Tu as tout compris. Tu es prêt(e) pour le niveau A2 !'],
+    [8, 'Très bien ! Tu comprends très bien le dialogue.'],
+    [6, 'Bien ! Relis le dialogue pour trouver les erreurs.'],
+    [0, 'Continue ! Relis le dialogue et regarde le vocabulaire avant de réessayer.']
+  ];
+  const msg = msgs.find(m => score >= m[0]);
+  document.getElementById('rmsg').textContent = msg[1];
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetQuiz() {
+  answered = 0; score = 0;
+  Object.keys(done).forEach(k => delete done[k]);
+  updateProgress();
+  document.querySelectorAll('.opt-btn,.vf-btn').forEach(b => {
+    b.disabled = false;
+    b.classList.remove('correct','wrong');
+  });
+  document.querySelectorAll('input.fill').forEach(inp => {
+    inp.disabled = false; inp.value = '';
+    inp.classList.remove('correct','wrong');
+  });
+  document.querySelectorAll('.check-btn').forEach(b => b.disabled = false);
+  document.querySelectorAll('.feedback').forEach(f => {
+    f.classList.remove('show','ok','bad'); f.textContent = '';
+  });
+  document.getElementById('results').classList.remove('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
